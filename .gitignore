@@ -1,0 +1,4 @@
+app/__pycache__/
+.idea
+app/lib/__pycache__/
+plot.png
