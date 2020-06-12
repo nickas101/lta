@@ -26,22 +26,6 @@ card2 = ""
 frequency = ""
 result_test3_full = pd.DataFrame()
 
-# cards11 = {'01': True, '02': True, '03': True, '04': True, '05': True, '06': True, '07': True, '08': True, '09': True, '10': True, '11': True, '12': True, '13': True, '14': True, '15': True, '16': True}
-# cards12 = {'17': False, '18': False, '19': False, '20': False, '21': False, '22': False, '23': False, '24': False, '25': False, '26': False, '27': False, '28': False, '29': False, '30': False, '31': False, '32': False}
-# cards21 = {'01': False, '02': False, '03': False, '04': False, '05': False, '06': False, '07': False, '08': False, '09': False, '10': False, '11': False, '12': False, '13': False, '14': False, '15': False, '16': False}
-# cards22 = {'17': False, '18': False, '19': False, '20': False, '21': False, '22': False, '23': False, '24': False, '25': False, '26': False, '27': False, '28': False, '29': False, '30': False, '31': False, '32': False}
-
-cards11 = {1: True, 2: True, 3: True, 4: True, 5: True, 6: True, 7: True, 8: True, 9: True, 10: True, 11: True, 12: True, 13: True, 14: True, 15: True, 16: True}
-cards12 = {17: False, 18: False, 19: False, 20: False, 21: False, 22: False, 23: False, 24: False, 25: False, 26: False, 27: False, 28: False, 29: False, 30: False, 31: False, 32: False}
-cards21 = {1: False, 2: False, 3: False, 4: False, 5: False, 6: False, 7: False, 8: False, 9: False, 10: False, 11: False, 12: False, 13: False, 14: False, 15: False, 16: False}
-cards22 = {17: False, 18: False, 19: False, 20: False, 21: False, 22: False, 23: False, 24: False, 25: False, 26: False, 27: False, 28: False, 29: False, 30: False, 31: False, 32: False}
-
-set_points = {0:'Pluto+', 1:'AKM2156'}
-
-vreg = 1.9
-vreg_threshold = 0.2
-ppm = 0
-ppm_threshold = 0.5
 
 file = r'\\Akl-file-01\Departments\Engineering - Product R&D\Test Results\SuperFast Test Results\ADVA M6575 jump screen'
 folder = ""
@@ -64,8 +48,6 @@ gauss = True
 diff_fltr = True
 diff_threshold = 0.2
 sigm = 10
-
-bootstrap = Bootstrap(app)
 
 
 

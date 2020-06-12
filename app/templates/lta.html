@@ -1,28 +1,19 @@
-{% extends "bootstrap/base.html" %}
+{% extends "base_generic.html" %}
 {% block title %}Please select{% endblock %}
 
 {% block navbar %}
 <div class="navbar navbar-fixed-top">
-  <!-- ... -->
 </div>
 {% endblock %}
 
 {% block content %}
-<div style = "margin: 20px; margin-left: 10%;">
-  <h4>Please select</h4>
+<div style = "margin: 40px; margin-left: 10%;">
   <p>
     <h3><a href="{{ url_for('lta_overdue') }}">Overdue crystals</a></h3></p>
     <p>
     <h3><a href="{{ url_for('lta_search') }}">LTA Runs</a></h3></p>
-    <!-- <h3><a href="{{ url_for('index') }}"> << back</a></h3></p> -->
     <div style="padding-top: 30px;"></div>
-    <p><a href="{{ url_for('index') }}" target="blank"><button class='btn btn-default'>Back</button></a></p>
+<!--    <p><a href="{{ url_for('index') }}" target="blank"><button class='btn btn-default'>Back</button></a></p>-->
 
-
-  <!-- <li class="next{% if not next_url %} disabled{% endif %}">
-    <a href="{{ next_url or '#' }}">
-        Older posts <span aria-hidden="true">&rarr;</span>
-    </a>
-</li> -->
 </div>
 {% endblock %}
