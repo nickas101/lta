@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Overdue crystals</title>
+
+    <style>
+        table {
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 5px;
+            padding-left: 8px;
+            font-size: smaller;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+
+</head>
+<body>
+
+    <h3 style="font-family: Arial, Helvetica, sans-serif">Overdue crystals</h3>
+        <!-- <a href="{{ url_for('index') }}"> << back</a></h3></p> -->
+        <!-- <div class="container" align="left"> -->
+            <a href="{{ url_for('lta') }}" target="blank"><button class='btn btn-default'>Back</button></a>
+            <a href="/lta/overdue/download/{{ filename }}" target="blank"><button class='btn btn-default'>Save as .CSV</button></a>
+       <!-- </div> -->
+
+    <table>
+        <tr>
+            {% for col in column_names %}
+            <th>{{col}}</th>
+            {% endfor %}
+        </tr>
+        {% for row in row_data %}
+        <tr>
+            {% for col, row_ in zip(column_names, row) %}
+            {% if col == link_column %}
+            <td>
+                <button type="submit" value={{ row_ }} name="person_id" form="patient_form" class="patient_button">
+                    {{ row_ }}
+                </button>
+            </td>
+            {% else %}
+            <td>{{row_}}</td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    
+    </table>
+
+</body>
+</html>

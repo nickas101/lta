@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <title>Please select</title>
+    </head>
+    <div style = "margin: 20px; margin-left: 10%;">
+         <form action="/lta/search" method="GET">
+          <input type="text" id="search" name="search">
+          <input type="submit" value="Search">
+        </form>
+        <p>Select a run to plot.</p>
+        <form id="form1" action="/lta/search" method="POST" enctype="multipart/form-data">
+            <select id="mySelect" name = "fold">
+                {% for folder in folders %}
+                    <option value="{{folder}}" {% if folder == "list_status" %} selected {% endif %}>{{folders[folder]}}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Submit">
+        </form>
+        <div style="padding-top: 30px;"></div>
+        {% if freq %}
+        <p><label for="freq">Frequency: <b>{{freq}}</b></label></p>
+        {% endif %}
+        {% if crystal_type %}
+        <p><label for="crystl">Crystal: <b>{{crystal_type}}</b></label></p>
+        {% endif %}
+         {% if owner %}
+        <p><label for="crystl">Owner: <b>{{owner}}</b></label></p>
+        {% endif %}
+         {% if start %}
+        <p><label for="crystl">Start Date: <b>{{start}}</b></label></p>
+        {% endif %}
+         {% if finish %}
+        <p><label for="crystl">Finish Date: <b>{{finish}}</b></label></p>
+        {% endif %}
+         {% if jig %}
+        <p><label for="crystl">Jig type: <b>{{jig}}</b></label></p>
+        {% endif %}
+         {% if packet %}
+        <p><label for="crystl">Packet: <b>{{packet}}</b></label></p>
+        {% endif %}
+         {% if sap %}
+        <p><label for="crystl">SAP #: <b>{{sap}}</b></label></p>
+        {% endif %}
+         {% if purp %}
+        <p><label for="crystl">Purpose: <b>{{purp}}</b></label></p>
+        {% endif %}
+
+        {% if freq %}
+
+        <div style="padding-top: 30px;"></div>
+
+        <form id="form2" action="{{ url_for('lta_plot_wait') }}" method="POST" enctype="multipart/form-data">
+
+        <input type="checkbox" id="norm" name="norm" value="checked" checked hidden>
+        <label for="norm" hidden> Normalize</label>
+
+        <div style="padding-top: 30px;"></div>
+<!--            <p><a href="{{ url_for('lta_plot_wait') }}" target="blank"><button class='btn btn-default'>Plot</button></a></p>-->
+
+            <input type="submit" value="Plot">
+        </form>
+        {% endif %}
+
+
+
+        <div style="padding-top: 30px;"></div>
+            <p><a href="{{ url_for('lta') }}" target="blank"><button class='btn btn-default'>Back</button></a></p>
+
+
+    </div>
+
+    </body>
+</html>

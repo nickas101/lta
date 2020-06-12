@@ -13,7 +13,7 @@ from datetime import datetime
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5003, debug=True)
     #serve(TransLogger(app, logger_name='lta', setup_console_handler=False), host='127.0.0.1', port=5003)
     #serve(TransLogger(app, logger_name='lta', setup_console_handler=False), host='172.20.7.226', port=8081)
 

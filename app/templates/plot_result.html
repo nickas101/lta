@@ -1,0 +1,76 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}Plot{% endblock %}
+
+{% block navbar %}
+<!--<div class="navbar navbar-fixed-top">-->
+  <!-- ... -->
+</div>
+{% endblock %}
+
+{% block content %}
+
+<!--.center {-->
+<!--  display: block;-->
+<!--  margin-left: auto;-->
+<!--  margin-right: auto;-->
+<!--  width: 50%;-->
+<!--}-->
+
+<!--  <h4 style="color: green;">{{ filename }}</h4>-->
+
+
+<!--  <img src="/lta/plot/plot.png" alt="my plot">-->
+    <img src="/lta/plot/plot.png" alt="my plot" align="middle">
+<div style = "margin: 20px; margin-left: 10%;">
+  <div style="padding-top: 10px;"></div>
+    <form id="form2" action="{{ url_for('lta_replot') }}" method="POST" enctype="multipart/form-data">
+<!--        <div class="custom-control custom-checkbox">-->
+        {% if normal %}
+            <input type="checkbox" id="norm" name="norm" class="custom-control-input" value="checked" checked hidden>
+        {% else %}
+            <input type="checkbox" id="norm" name="norm" class="custom-control-input" value="checked" hidden>
+        {% endif %}
+        <label for="norm" hidden> Normalize</label>
+
+                {% if diff %}
+            <input type="checkbox" style = "margin-left: 10px;" id="diff_fltr" name="diff_fltr" class="custom-control-input" value="checked" checked>
+        {% else %}
+            <input type="checkbox" style = "margin-left: 10px;" id="diff_fltr" name="diff_fltr" class="custom-control-input" value="checked">
+        {% endif %}
+        <label for="norm"> Filter</label>
+
+                        {% if gs %}
+            <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input" value="checked" checked>
+        {% else %}
+            <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input" value="checked">
+        {% endif %}
+        <label for="norm"> Smoothing</label>
+<!--        </div>-->
+
+        <div style="padding-top: 20px;"></div>
+<!--            <a href="{{ url_for('lta_search') }}" target="blank"><button class='btn btn-default'>Back</button></a>-->
+            <input type="submit" value="Re-plot"class='btn btn-primary'>
+<!--        <a href="/lta/plot/download" target="blank"><button class='btn btn-success'>Save plot</button></a>-->
+        </form>
+<div style="padding-top: 20px;"></div>
+            <a href="{{ url_for('lta_search') }}" target="blank"><button class='btn btn-default'>Back</button></a>
+<!--            <input type="submit" value="Re-plot"class='btn btn-primary'>-->
+        <a href="/lta/plot/download" target="blank"><button class='btn btn-success'>Save plot</button></a>
+
+    <div style="padding-top: 20px;"></div>
+
+
+
+    <!-- <h3><a href="{{ url_for('lta') }}">Long term ageing</a></h3></p>
+    <p>
+    <h3><a href="{{ url_for('index') }}">LOMAS Runs</a></h3></p>
+    <p>
+        <h3><a href="{{ url_for('process') }}">Processing</a></h3></p> -->
+
+  <!-- <li class="next{% if not next_url %} disabled{% endif %}">
+    <a href="{{ next_url or '#' }}">
+        Older posts <span aria-hidden="true">&rarr;</span>
+    </a>
+</li> -->
+</div>
+{% endblock %}
