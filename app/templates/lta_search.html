@@ -10,7 +10,14 @@
 
 {% block content %}
 
-    <div style = "margin-top: 30px;">
+
+
+    <div style = "margin-top: 30px;"></div>
+
+<div class="loader" style="display: none; z-index: 289;"></div>
+
+    <div class="container-fluid semihidden">
+
 
 
         <form class="form-horizontal" action="/lta/search" method="GET" enctype="multipart/form-data">
@@ -52,9 +59,11 @@
 
     {% endif %}
 
+
+
                 {% if freq %}
 
-    <form class="form-horizontal" action="{{ url_for('lta_plot_wait') }}" method="POST" enctype="multipart/form-data">
+    <form class="form-horizontal" action="{{ url_for('lta_plot') }}" method="POST" enctype="multipart/form-data">
 
         {% if freq %}
             <div class="form-group">
@@ -148,7 +157,7 @@
 
 
     <div class="col-sm-8">
-      <button type="submit" class="btn btn-success">Plot</button>
+      <button type="submit" class="btn btn-success spin">Plot</button>
     </div>
      <div class="col-sm-2"></div>
 
@@ -159,5 +168,6 @@
 
         {% endif %}
 
+    </div>
 
 {% endblock %}

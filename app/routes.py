@@ -388,28 +388,6 @@ def plot_png():
     return Response(output.getvalue(), mimetype='image/png')
 
 
-
-
-@app.route('/lta/plot/wait', methods=['post', 'get'])
-def lta_plot_wait():
-    global simple_folder
-    global part_number
-    global norm
-
-    if request.form.getlist('norm'):
-        norm = True
-    else:
-        norm = False
-
-
-    return render_template('wait_lta_plotting.html')
-
-
-
-
-
-
-
 @app.route('/lta/plot/download', methods=['GET', 'POST'])
 def download_plot():
     # global folder
