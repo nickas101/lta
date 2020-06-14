@@ -100,28 +100,6 @@ def select(index_external, df_external):
 
 
 def plot(plot_result):
-    # global connection
-    # global df
-    # global df_plot
-
-    # connection = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
-    #                     "Server=akl-longage3\LONGAGE3;"
-    #                     "Database=LTMAL3;"
-    #                     "UID=RAKON\nikolai;"
-    #                     "Trusted_Connection=yes;")
-    #
-    #
-    # run_id = str(df_external['pk_runID'].iloc[index_external])
-    #
-    # command = "select measDate, compFreq, loc, brd, fk_locID from measData " \
-    #           "join locData on measData.fk_locID = locData.pk_locID " \
-    #           "join brdData on brdData.pk_brdID = locData.fk_brdID " \
-    #           "where measData.fk_locID in (select pk_locID from locData where locData.fk_runID = '" + str(run_id) + "') " \
-    #             "and measData.frq <> '9999' and compFreq <> '9999'"
-    #
-    #
-    # plot_result = pd.read_sql(command, connection)
-
 
     plot_result.sort_values(['measDate'], ascending=[True], inplace=True)
     initial_time = plot_result['measDate'].iloc[0]
@@ -134,123 +112,136 @@ def plot(plot_result):
 
     # ****************************************************************
 
-    df_result = pd.DataFrame()
+    #df_result = pd.DataFrame()
 
-    threshold = 50
-    diff_threshold = .5
-    delta = 0
-    counter = 0
-    delta_local_previous = 0
+    # threshold = 50
+    # diff_threshold = .5
+    # delta = 0
+    # counter = 0
+    # delta_local_previous = 0
 
-    for location in locations:
-
-        df_single = plot_result[plot_result['fk_locID'] == location]
-
-        loc = df_single['loc'].iloc[0]
-        print(loc)
-
-        df_single.sort_values(['Days'], ascending=[True], inplace=True)
-
-        # print(df_single)
-
-        freq_initial = df_single['compFreq'].iloc[0]
-
-        freq_ppb = 1000000000 * (df_single['compFreq'] - freq_initial) / freq_initial
-
-        df_single['freq_ppb'] = freq_ppb
-        # df_single['freq_ppb_fltr'] = freq_ppb
-
-        df_single = df_single.reset_index()
-
-        count_row = df_single.shape[0]
-
-        # print(count_row)
-
-        for index, row in df_single.iterrows():
-            if index < count_row - 9:
-
-                previous = df_single['freq_ppb'].iloc[index:(index + 5)].mean()
-                current = df_single['freq_ppb'].iloc[(index + 5)]
-                next = df_single['freq_ppb'].iloc[(index + 5):(index + 10)].mean()
-
-                delta_local = next - previous
-                df_single.at[index + 5, 'DELTA_LOC'] = delta_local
-
-                if delta_local > threshold or delta_local < -threshold:
-
-                    delta_local_loc_max = delta_local
-
-                    for i in range(10):
-                        previous_loc = df_single['freq_ppb'].iloc[(index + i):(index + 5 + i)].mean()
-                        next_loc = df_single['freq_ppb'].iloc[(index + 5 + i):(index + 10 + i)].mean()
-                        delta_local_loc = next_loc - previous_loc
-                        if fabs(delta_local_loc) > fabs(delta_local_loc_max):
-                            delta_local_loc_max = delta_local_loc
-
-                    df_single.at[index + 5, 'DELTA_MAX'] = delta_local_loc_max
-
-                    if counter > 10:
-                        delta = delta - delta_local_loc_max
-                        counter = 0
-
-                df_single.at[index + 5, 'freq_ppb_fltr'] = df_single['freq_ppb'].iloc[(index + 7)] + delta  # +5
-                df_single.at[index + 5, 'DELTA'] = delta
-
-                counter = counter + 1
-
-        df_single['DIFF2'] = diff(df_single['freq_ppb_fltr'])
-
-        for index, row in df_single.iterrows():
-            if (index > 7 and index < (count_row - 7)):
-                if (df_single['DIFF2'].iloc[index] > diff_threshold or df_single['DIFF2'].iloc[
-                    index] < -diff_threshold):
-                    previous = df_single['freq_ppb_fltr'].iloc[index - 6:(index - 2)].mean()
-                    next = df_single['freq_ppb_fltr'].iloc[(index + 2):(index + 6)].mean()
-
-                    df_single.at[index, 'freq_ppb_fltr'] = (previous + next) / 2
-                    df_single.at[index - 1, 'freq_ppb_fltr'] = (previous + next) / 2
-                    df_single.at[index + 1, 'freq_ppb_fltr'] = (previous + next) / 2
-
-        df_single['DIFF3'] = diff(df_single['freq_ppb_fltr'])
-
-        for index, row in df_single.iterrows():
-            if (index > 7 and index < (count_row - 7)):
-                if (df_single['DIFF3'].iloc[index] > diff_threshold or df_single['DIFF3'].iloc[
-                    index] < -diff_threshold):
-                    previous = df_single['freq_ppb_fltr'].iloc[index - 6:(index - 2)].mean()
-                    next = df_single['freq_ppb_fltr'].iloc[(index + 2):(index + 6)].mean()
-
-                    df_single.at[index, 'freq_ppb_fltr'] = (previous + next) / 2
-                    df_single.at[index - 1, 'freq_ppb_fltr'] = (previous + next) / 2
-                    df_single.at[index + 1, 'freq_ppb_fltr'] = (previous + next) / 2
-
-        df_single.dropna(subset=['freq_ppb_fltr'], inplace=True)
-
-        df_single.sort_values(['Days'], ascending=[True], inplace=True)
-
-        freq_initial_2 = df_single['freq_ppb_fltr'].iloc[0]
-
-        df_single['freq_ppb_fltr_cut'] = df_single['freq_ppb_fltr'] - freq_initial_2
-
-        df_single = df_single.drop(df_single.columns[[0]], axis=1)
-
-        df_result = pd.concat([df_result, df_single], ignore_index=True, sort=False)
+    # for location in locations:
+    #
+    #
+    #     df_single = filter(plot_result, location, threshold, diff_threshold)
+    #
+    #
+    #     df_result = pd.concat([df_result, df_single], ignore_index=True, sort=False)
 
     # ****************************************************************
 
-    finish_time = datetime.now()
-    file_time = str(finish_time)
-    file_time = file_time.replace(" ", "_")
-    file_time = file_time.replace(":", "-")
-    file_time = file_time.split(".")
+    # finish_time = datetime.now()
+    # file_time = str(finish_time)
+    # file_time = file_time.replace(" ", "_")
+    # file_time = file_time.replace(":", "-")
+    # file_time = file_time.split(".")
+    #
+    #
+    # # # filename = filename.replace('.csv', '') + '_filtered.csv'
+    # # path = r"C:\\Temp\downloads"
+    # path = base_directory + r'/temp_files/'
+    # filename = path +  'lta_result_' + str(file_time[0]) + '.csv'
+    # # filename = path + r'result.csv'
+    # df_result.to_csv(filename, encoding = 'utf-8')
 
 
-    # # filename = filename.replace('.csv', '') + '_filtered.csv'
-    # path = r"C:\\Temp\downloads"
-    path = base_directory + r'/temp_files/'
-    filename = path +  'lta_result_' + str(file_time[0]) + '.csv'
-    # filename = path + r'result.csv'
-    df_result.to_csv(filename, encoding = 'utf-8')
+    return plot_result, locations
 
 
-    return df_result, locations
+
+
+def filter(plot_result, location, threshold, diff_threshold):
+    delta = 0
+    counter = 0
+
+    df_single = plot_result[plot_result['fk_locID'] == location]
+
+    loc = df_single['loc'].iloc[0]
+    print(loc)
+
+    df_single.sort_values(['Days'], ascending=[True], inplace=True)
+
+    # print(df_single)
+
+    freq_initial = df_single['compFreq'].iloc[0]
+
+    freq_ppb = 1000000000 * (df_single['compFreq'] - freq_initial) / freq_initial
+
+    df_single['freq_ppb'] = freq_ppb
+    # df_single['freq_ppb_fltr'] = freq_ppb
+
+    df_single = df_single.reset_index()
+
+    count_row = df_single.shape[0]
+
+    # print(count_row)
+
+    for index, row in df_single.iterrows():
+        if index < count_row - 9:
+
+            previous = df_single['freq_ppb'].iloc[index:(index + 5)].mean()
+            current = df_single['freq_ppb'].iloc[(index + 5)]
+            next = df_single['freq_ppb'].iloc[(index + 5):(index + 10)].mean()
+
+            delta_local = next - previous
+            df_single.at[index + 5, 'DELTA_LOC'] = delta_local
+
+            if delta_local > threshold or delta_local < -threshold:
+
+                delta_local_loc_max = delta_local
+
+                for i in range(10):
+                    previous_loc = df_single['freq_ppb'].iloc[(index + i):(index + 5 + i)].mean()
+                    next_loc = df_single['freq_ppb'].iloc[(index + 5 + i):(index + 10 + i)].mean()
+                    delta_local_loc = next_loc - previous_loc
+                    if fabs(delta_local_loc) > fabs(delta_local_loc_max):
+                        delta_local_loc_max = delta_local_loc
+
+                df_single.at[index + 5, 'DELTA_MAX'] = delta_local_loc_max
+
+                if counter > 10:
+                    delta = delta - delta_local_loc_max
+                    counter = 0
+
+            df_single.at[index + 5, 'freq_ppb_fltr'] = df_single['freq_ppb'].iloc[(index + 7)] + delta  # +5
+            df_single.at[index + 5, 'DELTA'] = delta
+
+            counter = counter + 1
+
+    df_single['DIFF2'] = diff(df_single['freq_ppb_fltr'])
+
+    for index, row in df_single.iterrows():
+        if (index > 7 and index < (count_row - 7)):
+            if (df_single['DIFF2'].iloc[index] > diff_threshold or df_single['DIFF2'].iloc[
+                index] < -diff_threshold):
+                previous = df_single['freq_ppb_fltr'].iloc[index - 6:(index - 2)].mean()
+                next = df_single['freq_ppb_fltr'].iloc[(index + 2):(index + 6)].mean()
+
+                df_single.at[index, 'freq_ppb_fltr'] = (previous + next) / 2
+                df_single.at[index - 1, 'freq_ppb_fltr'] = (previous + next) / 2
+                df_single.at[index + 1, 'freq_ppb_fltr'] = (previous + next) / 2
+
+    df_single['DIFF3'] = diff(df_single['freq_ppb_fltr'])
+
+    for index, row in df_single.iterrows():
+        if (index > 7 and index < (count_row - 7)):
+            if (df_single['DIFF3'].iloc[index] > diff_threshold or df_single['DIFF3'].iloc[
+                index] < -diff_threshold):
+                previous = df_single['freq_ppb_fltr'].iloc[index - 6:(index - 2)].mean()
+                next = df_single['freq_ppb_fltr'].iloc[(index + 2):(index + 6)].mean()
+
+                df_single.at[index, 'freq_ppb_fltr'] = (previous + next) / 2
+                df_single.at[index - 1, 'freq_ppb_fltr'] = (previous + next) / 2
+                df_single.at[index + 1, 'freq_ppb_fltr'] = (previous + next) / 2
+
+    df_single.dropna(subset=['freq_ppb_fltr'], inplace=True)
+
+    df_single.sort_values(['Days'], ascending=[True], inplace=True)
+
+    freq_initial_2 = df_single['freq_ppb_fltr'].iloc[0]
+
+    df_single['freq_ppb_fltr_cut'] = df_single['freq_ppb_fltr'] - freq_initial_2
+
+    df_single = df_single.drop(df_single.columns[[0]], axis=1)
+
+    return df_single

@@ -51,6 +51,8 @@ diff_fltr = True
 diff_threshold = 0.2
 sigm = 10
 entered_search = ''
+current = ''
+progress = ''
 
 
 
@@ -118,6 +120,11 @@ def lta_search():
     global purposes
     global entered_search
     global plot_result1
+    global current
+    global progress
+
+    current = ''
+    progress = '0%'
 
     freq = ''
     purp = ''
@@ -205,9 +212,40 @@ def lta_plot():
     global norm
     global diff_fltr
     global gauss
+    global current
+    global progress
+
+    threshold = 50
+    diff_threshold = .5
+    current = ''
+    progress = '0%'
 
     plot_result1 = lta_script.select(selected, result)
-    plot_result, locations = lta_script.plot(plot_result1)
+    plot_result2, locations = lta_script.plot(plot_result1)
+
+    plot_result = pd.DataFrame()
+
+    total = len(locations)
+
+    print(total)
+    i = 1
+
+
+    for location in locations:
+
+        current = str(i) + '/' + str(total)
+        progr = round(100*(i/total), 0)
+        if progr > 100:
+            progr = 100
+        progress = str(progr) + '%'
+
+        df_single = lta_script.filter(plot_result2, location, threshold, diff_threshold)
+
+        plot_result = pd.concat([plot_result, df_single], ignore_index=True, sort=False)
+
+        i = i + 1
+
+
 
     return render_template('plot_result.html', filename = filename_plt, normal = norm, diff = diff_fltr, gs = gauss)
 
@@ -216,11 +254,13 @@ def lta_plot():
 def data():
 
     def prepare_data():
+        global current
+        global progress
 
 
         json_data = json.dumps(
-            {'progress': '70%',
-             'current': '7/10',
+            {'progress': progress,
+             'current': current,
              })
 
         yield f"data:{json_data}\n\n"

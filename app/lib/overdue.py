@@ -1,6 +1,4 @@
-import os
-import sys
-import pyodbc 
+import pyodbc
 import pandas as pd
 
 
@@ -68,10 +66,7 @@ def request():
     df = df.drop(columns=['loc', 'locs'])
     df1['nbr'] = df.groupby(['runNumber'])['brd'].count()
     result = pd.concat([df1, df], axis=1, join='inner')
-    result = result.drop_duplicates() 
-    # result.sort_values(['brd', 'runNumber'], ascending=[True, True], inplace=True)
+    result = result.drop_duplicates()
     result.sort_values(['owner', 'brd'], ascending=[True, True], inplace=True)
-    # result = result.set_index('brd')
-
 
     return result
