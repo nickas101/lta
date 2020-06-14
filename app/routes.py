@@ -8,6 +8,8 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import scipy.ndimage as ndimage
 import io
+import json
+import time
 
 from flask_bootstrap import Bootstrap
 
@@ -208,6 +210,24 @@ def lta_plot():
     plot_result, locations = lta_script.plot(plot_result1)
 
     return render_template('plot_result.html', filename = filename_plt, normal = norm, diff = diff_fltr, gs = gauss)
+
+
+@app.route('/lta/data')
+def data():
+
+    def prepare_data():
+
+
+        json_data = json.dumps(
+            {'progress': '70%',
+             'current': '7/10',
+             })
+
+        yield f"data:{json_data}\n\n"
+
+        time.sleep(.5)
+
+    return Response(prepare_data(), mimetype='text/event-stream')
 
 
 @app.route('/lta/replot', methods=['post', 'get'])
