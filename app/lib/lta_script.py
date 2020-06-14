@@ -28,6 +28,8 @@ plotted = False
 
 
 def search(search_text = "Siward"):
+    if search_text == 'Brian' or search_text == 'Bryan' or search_text == 'brian' or search_text == 'bryan':
+        search_text = "Ryan"
     connection = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                         "Server=akl-longage3\LONGAGE3;"
                         "Database=LTMAL3;"
@@ -74,9 +76,6 @@ def search(search_text = "Siward"):
 
 
 def select(index_external, df_external):
-    # global connection
-    # global df
-    # global df_plot
 
     connection = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
                         "Server=akl-longage3\LONGAGE3;"
@@ -168,7 +167,6 @@ def filter(plot_result, location, threshold, diff_threshold):
     freq_ppb = 1000000000 * (df_single['compFreq'] - freq_initial) / freq_initial
 
     df_single['freq_ppb'] = freq_ppb
-    # df_single['freq_ppb_fltr'] = freq_ppb
 
     df_single = df_single.reset_index()
 
@@ -243,5 +241,20 @@ def filter(plot_result, location, threshold, diff_threshold):
     df_single['freq_ppb_fltr_cut'] = df_single['freq_ppb_fltr'] - freq_initial_2
 
     df_single = df_single.drop(df_single.columns[[0]], axis=1)
+
+    if df_single['Days'].max() < 25:
+        sigma = 2
+    elif df_single['Days'].max() < 50:
+        sigma = 4
+    elif df_single['Days'].max() < 80:
+        sigma = 7
+    else:
+        sigma = 20
+
+    df_single['freq_ppb_fltr_cut_smo_temp'] = ndimage.gaussian_filter(df_single['freq_ppb_fltr_cut'], sigma=sigma, order=0)
+    df_single['freq_ppb_smo_temp'] = ndimage.gaussian_filter(df_single['freq_ppb'], sigma=sigma, order=0)
+
+    df_single['freq_ppb_fltr_cut_smo'] = df_single['freq_ppb_fltr_cut_smo_temp'] - df_single['freq_ppb_fltr_cut_smo_temp'].iloc[0]
+    df_single['freq_ppb_smo'] = df_single['freq_ppb_smo_temp'] - df_single['freq_ppb_smo_temp'].iloc[0]
 
     return df_single

@@ -400,7 +400,7 @@ def plot1_png():
             sigma = 50
 
         #if gauss:
-        data_plot = ndimage.gaussian_filter(data, sigma=sigma, order=0)
+        data_plot = result_single['freq_ppb_fltr_cut_smo']
         # else:
         #     data_plot = data
 
@@ -547,7 +547,7 @@ def plot2_png():
             sigma = 50
 
         #if gauss:
-        data_plot = ndimage.gaussian_filter(data, sigma=sigma, order=0)
+        data_plot = result_single['freq_ppb_smo']
         #else:
         #    data_plot = data
 
