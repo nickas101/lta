@@ -2,49 +2,37 @@
 {% block title %}Plot{% endblock %}
 
 {% block navbar %}
-<!--<div class="navbar navbar-fixed-top">-->
-  <!-- ... -->
-</div>
+
 {% endblock %}
 
 {% block content %}
 
-<!--.center {-->
-<!--  display: block;-->
-<!--  margin-left: auto;-->
-<!--  margin-right: auto;-->
-<!--  width: 50%;-->
-<!--}-->
-
-<!--  <h4 style="color: green;">{{ filename }}</h4>-->
-
-
-<!--  <img src="/lta/plot/plot.png" alt="my plot">-->
-    <img src="/lta/plot/plot.png" alt="my plot" align="middle">
+    <img class="plot1" src="/lta/plot/plot1.png" alt="my plot" align="middle">
+    <img class="plot2" src="/lta/plot/plot2.png" alt="my plot" align="middle">
 <div style = "margin: 20px; margin-left: 10%;">
   <div style="padding-top: 10px;"></div>
     <form id="form2" action="{{ url_for('lta_replot') }}" method="POST" enctype="multipart/form-data">
 <!--        <div class="custom-control custom-checkbox">-->
-        {% if normal %}
-            <input type="checkbox" id="norm" name="norm" class="custom-control-input" value="checked" checked hidden>
-        {% else %}
-            <input type="checkbox" id="norm" name="norm" class="custom-control-input" value="checked" hidden>
-        {% endif %}
-        <label for="norm" hidden> Normalize</label>
+<!--        {% if normal %}-->
+<!--            <input type="checkbox" id="norm" name="norm" class="custom-control-input" value="checked" checked hidden>-->
+<!--        {% else %}-->
+<!--            <input type="checkbox" id="norm" name="norm" class="custom-control-input" value="checked" hidden>-->
+<!--        {% endif %}-->
+<!--        <label for="norm" hidden> Normalize</label>-->
 
                 {% if diff %}
-            <input type="checkbox" style = "margin-left: 10px;" id="diff_fltr" name="diff_fltr" class="custom-control-input" value="checked" checked>
+            <input type="checkbox" style = "margin-left: 10px;" id="diff_fltr" name="diff_fltr" class="custom-control-input filter" value="checked" checked>
         {% else %}
-            <input type="checkbox" style = "margin-left: 10px;" id="diff_fltr" name="diff_fltr" class="custom-control-input" value="checked">
+            <input type="checkbox" style = "margin-left: 10px;" id="diff_fltr" name="diff_fltr" class="custom-control-input filter" value="checked">
         {% endif %}
-        <label for="norm"> Filter</label>
+        <label for="diff_fltr"> Filter</label>
 
                         {% if gs %}
             <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input" value="checked" checked>
         {% else %}
             <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input" value="checked">
         {% endif %}
-        <label for="norm"> Smoothing</label>
+        <label for="gauss"> Smoothing</label>
 <!--        </div>-->
 
         <div style="padding-top: 20px;"></div>

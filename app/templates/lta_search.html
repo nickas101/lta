@@ -14,7 +14,18 @@
 
     <div style = "margin-top: 30px;"></div>
 
-<div class="loader" style="display: none; z-index: 289;"></div>
+<!--<div class="loader" style="display: none; z-index: 289;"></div>-->
+
+    <div class="container bar">
+<!--        <div class="col-sm-1"></div>-->
+
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="" aria-valuemin="1" aria-valuemax="3" style="min-width: 2em; width: {{ progress }}%;">
+            {{ i+1 }}/{{ total_units }}
+            </div>
+        </div>
+<!--        <div class="col-sm-1"></div>-->
+    </div>
 
     <div class="container-fluid semihidden">
 
