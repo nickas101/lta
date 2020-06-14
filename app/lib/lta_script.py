@@ -34,25 +34,11 @@ def search(search_text = "Siward"):
                         "UID=RAKON\nikolai;"
                         "Trusted_Connection=yes;")
 
-    
-    # if all_units:
-    #     command = "select * from locData join brdData on locData.fk_brdID = brdData.pk_brdID join runData on runData.pk_runID = locData.fk_runID where runData.currentRun = 'True' and runData.finishDate < CURRENT_TIMESTAMP"
-    # elif crystalType == '':
-    #     if moustrap:
-    #         command = "select * from locData join brdData on locData.fk_brdID = brdData.pk_brdID join runData on runData.pk_runID = locData.fk_runID where runData.currentRun = 'True' and runData.finishDate < CURRENT_TIMESTAMP and runData.oscillator = 'Mousetrap'"
-    #     else:
-    #         command = "select * from locData join brdData on locData.fk_brdID = brdData.pk_brdID join runData on runData.pk_runID = locData.fk_runID where runData.currentRun = 'True' and runData.finishDate < CURRENT_TIMESTAMP and runData.oscillator <> 'Mousetrap'"
-    # else:
-    #     if moustrap:
-    #         command = "select * from locData join brdData on locData.fk_brdID = brdData.pk_brdID join runData on runData.pk_runID = locData.fk_runID where runData.currentRun = 'True' and runData.finishDate < CURRENT_TIMESTAMP and runData.oscillator = 'Mousetrap' and runData.crystalType = " + crystalType
-    #     else:
-    #         command = "select * from locData join brdData on locData.fk_brdID = brdData.pk_brdID join runData on runData.pk_runID = locData.fk_runID where runData.currentRun = 'True' and runData.finishDate < CURRENT_TIMESTAMP and runData.oscillator <> 'Mousetrap' and runData.crystalType = " + crystalType
-
-
-    # command = "select * from measData where measData.fk_locID = '5A09D288-6325-431E-9664-ED7CA5A44FAE' and measData.frq <> '9999'"
-
-    command = "select * from runData where runData.purpose like '%" + str(search_text) + "%' or runData.comment like '%" + str(search_text) + "%' or runData.packetNumber like '%" + str(search_text) + "%' or runData.crystalNumber like '%" + str(search_text) + "%'"
-
+    command = "select * from runData where runData.purpose like '%" + str(search_text) \
+              + "%' or runData.comment like '%" + str(search_text) \
+              + "%' or runData.owner like '%" + str(search_text) \
+              + "%' or runData.packetNumber like '%" + str(search_text) \
+              + "%' or runData.crystalNumber like '%" + str(search_text) + "%'"
 
     df = pd.read_sql(command, connection)
 
