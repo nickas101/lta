@@ -11,6 +11,10 @@ import io
 import json
 import time
 
+from celery import Celery
+
+from multiprocessing import Process, Pipe, Value, Manager
+
 from flask_bootstrap import Bootstrap
 
 from .lib import overdue
@@ -52,7 +56,7 @@ diff_threshold = 0.2
 sigm = 10
 entered_search = ''
 current = ''
-progress = ''
+progress = '2%'
 
 
 
@@ -124,7 +128,7 @@ def lta_search():
     global progress
 
     current = ''
-    progress = '0%'
+    progress = '2%'
 
     freq = ''
     purp = ''
@@ -218,7 +222,7 @@ def lta_plot():
     threshold = 50
     diff_threshold = .5
     current = ''
-    progress = '0%'
+    progress = '2%'
 
     plot_result1 = lta_script.select(selected, result)
     plot_result2, locations = lta_script.plot(plot_result1)
@@ -234,7 +238,7 @@ def lta_plot():
     for location in locations:
 
         current = str(i) + '/' + str(total)
-        progr = round(100*(i/total), 0)
+        progr = int(round(100*(i/total), 0))
         if progr > 100:
             progr = 100
         progress = str(progr) + '%'
@@ -260,7 +264,8 @@ def data():
 
         json_data = json.dumps(
             {'progress': progress,
-             'current': current,
+             'current': progress,
+             # 'current': current,
              })
 
         yield f"data:{json_data}\n\n"
