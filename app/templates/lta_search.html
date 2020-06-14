@@ -1,73 +1,163 @@
-<html>
-    <head>
-        <title>Please select</title>
-    </head>
-    <div style = "margin: 20px; margin-left: 10%;">
-         <form action="/lta/search" method="GET">
-          <input type="text" id="search" name="search">
-          <input type="submit" value="Search">
+{% extends "base_generic.html" %}
+
+{% block title %}Please select{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-fixed-top">
+  <!-- ... -->
+</div>
+{% endblock %}
+
+{% block content %}
+
+    <div style = "margin-top: 30px;">
+
+
+        <form class="form-horizontal" action="/lta/search" method="GET" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <div class="col-sm-1">
+                    <a href="{{ url_for('lta') }}" target="blank"><button type="button" href="{{ url_for('lta') }}" class="btn btn-default pull-right">Back</button></a>
+                </div>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" id="search" name="search" value="{{ entered_search }}" placeholder="Search string">
+                </div>
+                <div class="col-sm-1">
+                    <button type="submit" class="btn btn-default">Search</button>
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+
         </form>
-        <p>Select a run to plot.</p>
-        <form id="form1" action="/lta/search" method="POST" enctype="multipart/form-data">
-            <select id="mySelect" name = "fold">
-                {% for folder in folders %}
-                    <option value="{{folder}}" {% if folder == "list_status" %} selected {% endif %}>{{folders[folder]}}</option>
+
+    {% if purposes %}
+        <form class="form-horizontal" action="/lta/search" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+            <div class="col-sm-1"></div>
+        <div class="col-sm-9">
+
+            <select  class="form-control" id="mySelect" name="purpose">
+                {% for purpose in purposes %}
+                    <option value="{{purpose}}" {% if purpose==entered_purpose %} selected {% endif %}>{{purposes[purpose]}}</option>
                 {% endfor %}
             </select>
-            <input type="submit" value="Submit">
+
+            </div>
+           <div class="col-sm-1">
+          <button type="submit" class="btn btn-default">Check</button>
+     </div>
+          <div class="col-sm-1"></div>
+          </div>
         </form>
-        <div style="padding-top: 30px;"></div>
+
+    {% endif %}
+
+                {% if freq %}
+
+    <form class="form-horizontal" action="{{ url_for('lta_plot_wait') }}" method="POST" enctype="multipart/form-data">
+
         {% if freq %}
-        <p><label for="freq">Frequency: <b>{{freq}}</b></label></p>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Frequency</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{freq}}</p>
+                </div>
+            </div>
         {% endif %}
+
         {% if crystal_type %}
-        <p><label for="crystl">Crystal: <b>{{crystal_type}}</b></label></p>
-        {% endif %}
-         {% if owner %}
-        <p><label for="crystl">Owner: <b>{{owner}}</b></label></p>
-        {% endif %}
-         {% if start %}
-        <p><label for="crystl">Start Date: <b>{{start}}</b></label></p>
-        {% endif %}
-         {% if finish %}
-        <p><label for="crystl">Finish Date: <b>{{finish}}</b></label></p>
-        {% endif %}
-         {% if jig %}
-        <p><label for="crystl">Jig type: <b>{{jig}}</b></label></p>
-        {% endif %}
-         {% if packet %}
-        <p><label for="crystl">Packet: <b>{{packet}}</b></label></p>
-        {% endif %}
-         {% if sap %}
-        <p><label for="crystl">SAP #: <b>{{sap}}</b></label></p>
-        {% endif %}
-         {% if purp %}
-        <p><label for="crystl">Purpose: <b>{{purp}}</b></label></p>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Crystal</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{crystal_type}}</p>
+                </div>
+            </div>
         {% endif %}
 
-        {% if freq %}
+        {% if owner %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Owner</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{owner}}</p>
+                </div>
+            </div>
+        {% endif %}
 
-        <div style="padding-top: 30px;"></div>
+        {% if start %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Start Date</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{start}}</p>
+                </div>
+            </div>
+        {% endif %}
 
-        <form id="form2" action="{{ url_for('lta_plot_wait') }}" method="POST" enctype="multipart/form-data">
+        {% if finish %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Finish Date</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{finish}}</p>
+                </div>
+            </div>
+        {% endif %}
 
-        <input type="checkbox" id="norm" name="norm" value="checked" checked hidden>
-        <label for="norm" hidden> Normalize</label>
+        {% if jig %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Jig type</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{jig}}</p>
+                </div>
+            </div>
+        {% endif %}
 
-        <div style="padding-top: 30px;"></div>
-<!--            <p><a href="{{ url_for('lta_plot_wait') }}" target="blank"><button class='btn btn-default'>Plot</button></a></p>-->
+        {% if packet %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Packet</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{packet}}</p>
+                </div>
+            </div>
+        {% endif %}
 
-            <input type="submit" value="Plot">
-        </form>
+        {% if sap %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">SAP #</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{sap}}</p>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if purp %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Purpose</label>
+                <div class="col-sm-10">
+                  <p class="form-control-static">{{purp}}</p>
+                </div>
+            </div>
         {% endif %}
 
 
 
-        <div style="padding-top: 30px;"></div>
-            <p><a href="{{ url_for('lta') }}" target="blank"><button class='btn btn-default'>Back</button></a></p>
 
 
+
+  <div class="form-group">
+
+      <div class="col-sm-2"></div>
+
+
+    <div class="col-sm-8">
+      <button type="submit" class="btn btn-success">Plot</button>
     </div>
+     <div class="col-sm-2"></div>
 
-    </body>
-</html>
+
+  </div>
+        </form>
+
+
+        {% endif %}
+
+
+{% endblock %}

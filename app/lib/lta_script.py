@@ -34,8 +34,6 @@ def search(search_text = "Siward"):
                         "UID=RAKON\nikolai;"
                         "Trusted_Connection=yes;")
 
-
-    # register_matplotlib_converters()
     
     # if all_units:
     #     command = "select * from locData join brdData on locData.fk_brdID = brdData.pk_brdID join runData on runData.pk_runID = locData.fk_runID where runData.currentRun = 'True' and runData.finishDate < CURRENT_TIMESTAMP"
@@ -58,8 +56,6 @@ def search(search_text = "Siward"):
 
     df = pd.read_sql(command, connection)
 
-    # df['startDate'] = df['startDate'].dt.date
-    # df['finishDate'] = df['finishDate'].dt.date
 
 
     # Examples
@@ -81,10 +77,17 @@ def search(search_text = "Siward"):
     # # gaussian filter
     # df_filtered = ndimage.gaussian_filter(df_freq, sigma=25, order=0)
 
-    return df
+    i = 0
+    purposes = {}
+    for item in df['purpose']:
+        purposes[i] = item
+        i = i + 1
+
+    return df, purposes
 
 
-def plot(index_external, df_external):
+
+def select(index_external, df_external):
     # global connection
     # global df
     # global df_plot
@@ -106,6 +109,32 @@ def plot(index_external, df_external):
 
 
     plot_result = pd.read_sql(command, connection)
+
+    return plot_result
+
+
+def plot(plot_result):
+    # global connection
+    # global df
+    # global df_plot
+
+    # connection = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
+    #                     "Server=akl-longage3\LONGAGE3;"
+    #                     "Database=LTMAL3;"
+    #                     "UID=RAKON\nikolai;"
+    #                     "Trusted_Connection=yes;")
+    #
+    #
+    # run_id = str(df_external['pk_runID'].iloc[index_external])
+    #
+    # command = "select measDate, compFreq, loc, brd, fk_locID from measData " \
+    #           "join locData on measData.fk_locID = locData.pk_locID " \
+    #           "join brdData on brdData.pk_brdID = locData.fk_brdID " \
+    #           "where measData.fk_locID in (select pk_locID from locData where locData.fk_runID = '" + str(run_id) + "') " \
+    #             "and measData.frq <> '9999' and compFreq <> '9999'"
+    #
+    #
+    # plot_result = pd.read_sql(command, connection)
 
 
     plot_result.sort_values(['measDate'], ascending=[True], inplace=True)
@@ -239,76 +268,3 @@ def plot(index_external, df_external):
 
 
     return df_result, locations
-    # return df_selected, locations
-
-
-
-
-
-
-
-
-        # index = self.listWidget.currentRow()
-
-        # freq = str(df['nomFrq'].iloc[index] / 1000000) + "MHz"
-        # purpose = str(df['purpose'].iloc[index])
-        # crystal_type = str(df['crystalType'].iloc[index])
-        # owner = str(df['owner'].iloc[index])
-        # sap = str(df['crystalNumber'].iloc[index])
-
-        # df['startDate'] = df['startDate'].dt.date
-        # df['finishDate'] = df['finishDate'].dt.date
-        # start = str(df['startDate'].iloc[index])
-        # finish = str(df['finishDate'].iloc[index])
-        # jig = str(df['oscillator'].iloc[index])
-        # packet = str(df['packetNumber'].iloc[index])
-
-
-
-
-        # index = self.listWidget.currentRow()
-
-        # freq = str(df['nomFrq'].iloc[index] / 1000000) + "MHz"
-        # purpose = str(df['purpose'].iloc[index])
-        # crystal_type = str(df['crystalType'].iloc[index])
-        # owner = str(df['owner'].iloc[index])
-        # sap = str(df['crystalNumber'].iloc[index])
-        # start = str(df['startDate'].iloc[index])
-        # finish = str(df['finishDate'].iloc[index])
-        # jig = str(df['oscillator'].iloc[index])
-        # packet = str(df['packetNumber'].iloc[index])
-
-
-
-
-
-
-        # index = self.listWidget.currentRow()
-        # result, locations = plot(index)
-
-        # freq_nom = float(df['nomFrq'].iloc[index])
-        # freq_nom_str = str(float(df['nomFrq'].iloc[index]) / 1000000) + "MHz"
-        # crystal_type = df['crystalType'].iloc[index]
-        # crystal_number = df['crystalNumber'].iloc[index]
-        # packet_number = df['packetNumber'].iloc[index]
-
-
-        # plotTitle = "Ageing data for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(crystal_number) + ", packet #" + str(packet_number)
-        # ax1.set_title(plotTitle)
-        # ax1.set_xlabel('Time')
-        # ax1.set_ylabel('Frequency, ppm')
-        # ax1.tick_params(axis = 'y', colors = 'b')
-
-        # for location in locations:
-        #     result_single = df_plot[df_plot['fk_locID'] == location]
-        #     result_single = result_single.sort_values(by=['measDate'])
-        #     freq_ppm = 1000000 * (result_single['compFreq'] - freq_nom) / freq_nom
-        #     data = freq_ppm
-        #     bins = result_single['measDate']
-
-        #     ax1.plot(bins, data, alpha=1, label="LTA", linewidth=1)
-
-
-
-
-# search()

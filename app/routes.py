@@ -28,16 +28,16 @@ result_test3_full = pd.DataFrame()
 
 
 file = r'\\Akl-file-01\Departments\Engineering - Product R&D\Test Results\SuperFast Test Results\ADVA M6575 jump screen'
-folder = ""
 simple_folder = ""
 part_number = ""
 result = pd.DataFrame()
 result_runs = pd.DataFrame()
 plot_result = pd.DataFrame()
+plot_result1 = pd.DataFrame()
 # links = pd.DataFrame(columns=['pk_BatchId', 'fk_TestSystemId','link'])
 links = pd.DataFrame(columns=['pk_BatchId', 'link'])
 selected = 0
-purpose = {}
+purposes = {}
 locations = {}
 plot_filename = ""
 filename_plt = ""
@@ -48,6 +48,7 @@ gauss = True
 diff_fltr = True
 diff_threshold = 0.2
 sigm = 10
+entered_search = ''
 
 
 
@@ -90,31 +91,11 @@ def lta_overdue():
     filename_full = folder + filename
     result.to_csv(filename_full, encoding = 'utf-8')
 
-    # return render_template('result.html',  tables=[result.to_html(classes='data')], titles=result.columns.values)
-    # return render_template('result.html',  tables=result.to_html(classes='data'), titles=result.columns.values)
-    # return render_template('result.html',  table=result, titles=result.columns.values)
-    # return render_template('result.html',  tables=[result.to_html(classes='data', header="true")])
-    # return render_template("result.html", column_names=result.columns.values, row_data=list(result.values.tolist()),
-    #                        link_column="locs", zip=zip)
-    return render_template("result.html", column_names=result_table.columns.values, filename = filename, row_data=list(result_table.values.tolist()), zip=zip)
-
-
-
-@app.route('/lta/plot/wait', methods=['post', 'get'])
-def lta_plot_wait():
-    global simple_folder
-    global part_number
-    global norm
-
-    if request.form.getlist('norm'):
-        norm = True
-    else:
-        norm = False
-
-
-    return render_template('wait_lta_plotting.html')
-
-
+    return render_template("lta_overdue.html",
+                           column_names=result_table.columns.values,
+                           filename = filename,
+                           row_data=list(result_table.values.tolist()),
+                           zip=zip)
 
 
 @app.route('/lta/overdue/download/<path:filename>', methods=['GET', 'POST'])
@@ -124,16 +105,6 @@ def download_file(filename):
     return send_from_directory(folder, filename=filename, as_attachment=True)
 
 
-@app.route('/lta/plot/download', methods=['GET', 'POST'])
-def download_plot():
-    # global folder
-    global plot_filename
-    global filename_plt
-
-    # folder = r'C:/Temp/downloads/'
-    folder = base_directory + r'/temp_files/'
-
-    return send_from_directory(folder, filename=filename_plt, as_attachment=True)
 
 
 
@@ -142,69 +113,71 @@ def download_plot():
 def lta_search():
     global result
     global selected
-    global purpose
+    global purposes
+    global entered_search
+    global plot_result1
+
+    freq = ''
+    purp = ''
+    crystal_type = ''
+    owner = ''
+    sap = ''
+    start_date = ''
+    finish_date = ''
+    jig = ''
+    packet = ''
 
     if request.method == 'POST':
-        selected = int(request.form.get('fold'))
-        print("***Selected from list: " + str(selected))
-
-        preview = result.iloc[selected]
+        selected = int(request.form.get('purpose'))
+        print("Selected from list: " + str(selected))
 
         freq = str(result['nomFrq'].iloc[selected] / 1000000) + "MHz"
         purp = str(result['purpose'].iloc[selected])
         crystal_type = str(result['crystalType'].iloc[selected])
         owner = str(result['owner'].iloc[selected])
         sap = str(result['crystalNumber'].iloc[selected])
-        #
-        # df['startDate'] = df['startDate'].dt.date
-        # df['finishDate'] = df['finishDate'].dt.date
         start = str(result['startDate'].iloc[selected])
         finish = str(result['finishDate'].iloc[selected])
-        start_date = start.split(" ")
-        finish_date = finish.split(" ")
+        start_date = start.split(" ")[0]
+        finish_date = finish.split(" ")[0]
         jig = str(result['oscillator'].iloc[selected])
         packet = str(result['packetNumber'].iloc[selected])
 
+        #plot_result1 = lta_script.select(selected, result)
 
-        return render_template('lta_search.html',
-                               folders=purpose,
-                               freq = freq,
-                               purp = purp,
-                               crystal_type = crystal_type,
-                               owner = owner,
-                               sap = sap,
-                               start = start_date[0],
-                               finish = finish_date[0],
-                               jig = jig,
-                               packet = packet
-                               )
+    elif request.method == 'GET' and request.args.get('search'):
+        entered_search = request.args.get('search')
+        print("Selected search: " + str(entered_search))
 
-    elif request.method == 'GET':
-        search_string = request.args.get('search')
-        print("***Selected search: " + str(search_string))
-
-        if search_string:
-            result = lta_script.search(search_string)
-            i = 0
-            purpose = {}
-            for item in result['purpose']:
-                purpose[i] = item
-                i = i + 1
-
-            return render_template('lta_search.html', folders=purpose)
-        else:
-            return render_template('lta_search.html', folders = [])
+        result, purposes = lta_script.search(entered_search)
 
     else:
-        return render_template('lta_search.html', folders = [])
+        purposes = {}
+        entered_search = ''
+
+    return render_template('lta_search.html',
+                           purposes=purposes,
+                           entered_purpose=selected,
+                           freq=freq,
+                           purp=purp,
+                           crystal_type=crystal_type,
+                           owner=owner,
+                           sap=sap,
+                           start=start_date,
+                           finish=finish_date,
+                           jig=jig,
+                           packet=packet,
+                           entered_search=entered_search
+                           )
 
 
 @app.route('/lta/plot', methods=['post', 'get'])
 def lta_plot():
     global result
     global selected
-    global purpose
+    global purposes
     global plot_result
+    global plot_result1
     global locations
     global plot_filename
     global filename_plt
@@ -212,7 +185,8 @@ def lta_plot():
     global diff_fltr
     global gauss
 
-    plot_result, locations = lta_script.plot(selected, result)
+    plot_result1 = lta_script.select(selected, result)
+    plot_result, locations = lta_script.plot(plot_result1)
 
     return render_template('plot_result.html', filename = filename_plt, normal = norm, diff = diff_fltr, gs = gauss)
 
@@ -221,7 +195,7 @@ def lta_plot():
 def lta_replot():
     global result
     global selected
-    global purpose
+    global purposes
     global plot_result
     global locations
     global plot_filename
@@ -255,7 +229,7 @@ def lta_replot():
 def plot_png():
     global result
     global selected
-    global purpose
+    global purposes
     global plot_result
     global locations
     global plot_filename
@@ -397,3 +371,36 @@ def plot_png():
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
+
+
+
+@app.route('/lta/plot/wait', methods=['post', 'get'])
+def lta_plot_wait():
+    global simple_folder
+    global part_number
+    global norm
+
+    if request.form.getlist('norm'):
+        norm = True
+    else:
+        norm = False
+
+
+    return render_template('wait_lta_plotting.html')
+
+
+
+
+
+
+
+@app.route('/lta/plot/download', methods=['GET', 'POST'])
+def download_plot():
+    # global folder
+    global plot_filename
+    global filename_plt
+
+    # folder = r'C:/Temp/downloads/'
+    folder = base_directory + r'/temp_files/'
+
+    return send_from_directory(folder, filename=filename_plt, as_attachment=True)
