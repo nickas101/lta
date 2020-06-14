@@ -16,6 +16,41 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" rel="stylesheet">
 
+
+
+    <style>
+
+
+        .loader {
+              border: 16px solid #f3f3f3; /* Light grey */
+              border-top: 16px solid #3498db; /* Blue */
+              border-radius: 50%;
+              width: 120px;
+              height: 120px;
+              animation: spin 1s linear infinite;
+              position: absolute;
+              left: 45%;
+              top: 40%;
+            }
+
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+
+            .semiopacity {
+        <!--    background: #0078c9; /* Цвет фона */-->
+            padding: 5px; /* Поля вокруг текста */
+            opacity: 0.3; /* Полупрозрачный фон */
+            filter: alpha(Opacity=30); /* Прозрачность в IE */
+        <!--    color: #fff; /* Цвет текста */-->
+
+    </style>
+
+
+
+
+
     <title>LTA</title>
   </head>
 
@@ -124,6 +159,38 @@
                 }
             }
         };
+
+
+
+        $(function() {
+           $(".auto_submit_item").change(function() {
+             $(".filter-form").submit();
+           });
+         });
+
+<!--        $(".search_submit").click(function() {-->
+
+<!--            setTimeout(function() {-->
+<!--                $(".filter-form").submit();-->
+<!--          }, 2000);-->
+<!--        });-->
+
+        $(".spin").click(function(){
+            $(".loader").fadeIn(1000);
+            $( ".semihidden" ).addClass( "semiopacity" );
+
+            setTimeout(function() {
+                $( ".spin" ).prop( "disabled", true );
+          }, 500);
+
+        });
+
+
+
+
+
+
+
 
         const context = document.getElementById('canvas').getContext('2d');
 

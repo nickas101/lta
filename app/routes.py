@@ -151,6 +151,22 @@ def lta_search():
 
         result, purposes = lta_script.search(entered_search)
 
+        if purposes:
+            selected = 0
+            print("Selected from list: " + str(selected))
+
+            freq = str(result['nomFrq'].iloc[selected] / 1000000) + "MHz"
+            purp = str(result['purpose'].iloc[selected])
+            crystal_type = str(result['crystalType'].iloc[selected])
+            owner = str(result['owner'].iloc[selected])
+            sap = str(result['crystalNumber'].iloc[selected])
+            start = str(result['startDate'].iloc[selected])
+            finish = str(result['finishDate'].iloc[selected])
+            start_date = start.split(" ")[0]
+            finish_date = finish.split(" ")[0]
+            jig = str(result['oscillator'].iloc[selected])
+            packet = str(result['packetNumber'].iloc[selected])
+
     else:
         purposes = {}
         entered_search = ''
