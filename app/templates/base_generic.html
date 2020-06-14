@@ -134,18 +134,65 @@
 
         });
 
-<!--        $(".filter").is(":checked")-->
+        $(".plot1").show();
+        $(".plot2").hide();
+        $(".plot3").hide();
+        $(".plot4").hide();
 
-<!--        if ($('.filter').attr('checked')) {-->
-        if ($('.filter').is(":checked")) {
-            $(".plot1").show();
-            $(".plot2").hide();
-        }
-        else
-        {
-            $(".plot2").show();
-            $(".plot1").hide();
-        }
+        $(".filter").change(function() {
+            if ($('.filter').is(":checked")) {
+                $(".plot2").hide();
+                $(".plot4").hide();
+
+                if ($('.gauss').is(":checked")) {
+                    $(".plot1").show();
+                    $(".plot3").hide();
+                } else {
+                    $(".plot3").show();
+                    $(".plot1").hide();
+                }
+
+            } else {
+                $(".plot1").hide();
+                $(".plot3").hide();
+
+                if ($('.gauss').is(":checked")) {
+                    $(".plot2").show();
+                    $(".plot4").hide();
+                } else {
+                    $(".plot4").show();
+                    $(".plot2").hide();
+                }
+            }
+        });
+
+        $(".gauss").change(function() {
+            if ($('.filter').is(":checked")) {
+                $(".plot2").hide();
+                $(".plot4").hide();
+
+                if ($('.gauss').is(":checked")) {
+                    $(".plot1").show();
+                    $(".plot3").hide();
+                } else {
+                    $(".plot3").show();
+                    $(".plot1").hide();
+                }
+
+            } else {
+                $(".plot1").hide();
+                $(".plot3").hide();
+
+                if ($('.gauss').is(":checked")) {
+                    $(".plot2").show();
+                    $(".plot4").hide();
+                } else {
+                    $(".plot4").show();
+                    $(".plot2").hide();
+                }
+            }
+        });
+
 
 
         const source = new EventSource("/lta/data");

@@ -9,6 +9,8 @@
 
     <img class="plot1" src="/lta/plot/plot1.png" alt="my plot" align="middle">
     <img class="plot2" src="/lta/plot/plot2.png" alt="my plot" align="middle">
+    <img class="plot3" src="/lta/plot/plot3.png" alt="my plot" align="middle">
+    <img class="plot4" src="/lta/plot/plot4.png" alt="my plot" align="middle">
 <div style = "margin: 20px; margin-left: 10%;">
   <div style="padding-top: 10px;"></div>
     <form id="form2" action="{{ url_for('lta_replot') }}" method="POST" enctype="multipart/form-data">
@@ -28,16 +30,16 @@
         <label for="diff_fltr"> Filter</label>
 
                         {% if gs %}
-            <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input" value="checked" checked>
+            <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input gauss" value="checked" checked>
         {% else %}
-            <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input" value="checked">
+            <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input gauss" value="checked">
         {% endif %}
         <label for="gauss"> Smoothing</label>
 <!--        </div>-->
 
         <div style="padding-top: 20px;"></div>
 <!--            <a href="{{ url_for('lta_search') }}" target="blank"><button class='btn btn-default'>Back</button></a>-->
-            <input type="submit" value="Re-plot"class='btn btn-primary'>
+            <input type="submit" value="Re-plot"class='btn btn-primary hidden'>
 <!--        <a href="/lta/plot/download" target="blank"><button class='btn btn-success'>Save plot</button></a>-->
         </form>
 <div style="padding-top: 20px;"></div>
