@@ -57,6 +57,7 @@ sigm = 10
 entered_search = ''
 current = ''
 progress = '2%'
+dot = False
 
 
 
@@ -218,6 +219,7 @@ def lta_plot():
     global gauss
     global current
     global progress
+    global dot
 
     threshold = 50
     diff_threshold = .5
@@ -251,7 +253,12 @@ def lta_plot():
 
 
 
-    return render_template('plot_result.html', filename = filename_plt, normal = norm, diff = diff_fltr, gs = gauss)
+    return render_template('plot_result.html',
+                           filename = filename_plt,
+                           normal = norm,
+                           diff = diff_fltr,
+                           dot=dot,
+                           gs = gauss)
 
 
 @app.route('/lta/data')
@@ -287,6 +294,7 @@ def lta_replot():
     global norm
     global diff_fltr
     global gauss
+    global dot
 
     if request.form.getlist('norm'):
         norm = True
@@ -303,9 +311,19 @@ def lta_replot():
     else:
         gauss = False
 
+    if request.form.getlist('dot'):
+        dot = True
+    else:
+        dot = False
+
     # plot_result, locations = lta_script.plot(selected, result)
 
-    return render_template('plot_result.html', filename = filename_plt, normal = norm, diff = diff_fltr, gs = gauss)
+    return render_template('plot_result.html',
+                           filename = filename_plt,
+                           normal = norm,
+                           diff = diff_fltr,
+                           dot=dot,
+                           gs = gauss)
 
 
 
@@ -321,6 +339,7 @@ def plot1_png():
     global norm
     global diff_fltr
     global gauss
+    global dot
 
 
     freq_nom = float(result['nomFrq'].iloc[selected])
@@ -410,7 +429,13 @@ def plot1_png():
         #     data = freq_ppm
 
         #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
-        axis.plot(bins, data_plot, alpha=1, label=label, linewidth= .75)
+        # axis.plot(bins, data_plot, alpha=1, label=label, linewidth= .75)
+
+        if dot:
+            axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
+        else:
+            axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
+
             #ax2 = axis.twinx()
             # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
 
@@ -468,6 +493,7 @@ def plot2_png():
     global norm
     global diff_fltr
     global gauss
+    global dot
 
 
     freq_nom = float(result['nomFrq'].iloc[selected])
@@ -557,7 +583,13 @@ def plot2_png():
         #     data = freq_ppm
 
         #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
-        axis.plot(bins, data_plot, alpha=1, label=label, linewidth= .75)
+        # axis.plot(bins, data_plot, alpha=1, label=label, linewidth= .75)
+
+        if dot:
+            axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
+        else:
+            axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
+
             #ax2 = axis.twinx()
             # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
 
@@ -617,6 +649,7 @@ def plot3_png():
     global norm
     global diff_fltr
     global gauss
+    global dot
 
 
     freq_nom = float(result['nomFrq'].iloc[selected])
@@ -706,7 +739,12 @@ def plot3_png():
         #     data = freq_ppm
 
         #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
-        axis.plot(bins, data_plot, alpha=1, label=label, linewidth= .75)
+
+        if dot:
+            axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
+        else:
+            axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
+
             #ax2 = axis.twinx()
             # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
 
@@ -764,6 +802,7 @@ def plot4_png():
     global norm
     global diff_fltr
     global gauss
+    global dot
 
 
     freq_nom = float(result['nomFrq'].iloc[selected])
@@ -853,7 +892,10 @@ def plot4_png():
         #     data = freq_ppm
 
         #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
-        axis.plot(bins, data_plot, alpha=1, label=label, linewidth= .75)
+        if dot:
+            axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
+        else:
+            axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
             #ax2 = axis.twinx()
             # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
 

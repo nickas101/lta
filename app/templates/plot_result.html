@@ -15,7 +15,7 @@
     <img class="plot4" src="/lta/plot/plot4.png" alt="my plot" align="middle">
 <div style = "margin: 20px; margin-left: 10%;">
   <div style="padding-top: 10px;"></div>
-    <form id="form2" action="{{ url_for('lta_replot') }}" method="POST" enctype="multipart/form-data">
+    <form class="replot" id="form2" action="{{ url_for('lta_replot') }}" method="POST" enctype="multipart/form-data">
 <!--        <div class="custom-control custom-checkbox">-->
 <!--        {% if normal %}-->
 <!--            <input type="checkbox" id="norm" name="norm" class="custom-control-input" value="checked" checked hidden>-->
@@ -24,26 +24,36 @@
 <!--        {% endif %}-->
 <!--        <label for="norm" hidden> Normalize</label>-->
 
-                {% if diff %}
+        {% if diff %}
             <input type="checkbox" style = "margin-left: 10px;" id="diff_fltr" name="diff_fltr" class="custom-control-input filter" value="checked" checked>
         {% else %}
             <input type="checkbox" style = "margin-left: 10px;" id="diff_fltr" name="diff_fltr" class="custom-control-input filter" value="checked">
         {% endif %}
         <label for="diff_fltr"> Filter</label>
 
-                        {% if gs %}
+        {% if gs %}
             <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input gauss" value="checked" checked>
         {% else %}
             <input type="checkbox" style = "margin-left: 10px;" id="gauss" name="gauss" class="custom-control-input gauss" value="checked">
         {% endif %}
         <label for="gauss"> Smoothing</label>
+
+        {% if dot %}
+            <input type="checkbox" style = "margin-left: 10px;" id="dot" name="dot" class="custom-control-input dot" value="checked" checked>
+        {% else %}
+            <input type="checkbox" style = "margin-left: 10px;" id="dot" name="dot" class="custom-control-input dot" value="checked">
+        {% endif %}
+        <label for="dot"> Markers</label>
 <!--        </div>-->
 
         <div style="padding-top: 20px;"></div>
 <!--            <a href="{{ url_for('lta_search') }}" target="blank"><button class='btn btn-default'>Back</button></a>-->
-            <input type="submit" value="Re-plot"class='btn btn-primary hidden'>
+<!--            <input type="submit" value="Re-plot"class='btn btn-primary replot'>-->
+        <button type="submit" id="replot" class="btn btn-primary hidden">Re-plot </button>
 <!--        <a href="/lta/plot/download" target="blank"><button class='btn btn-success'>Save plot</button></a>-->
         </form>
+
+
 <div style="padding-top: 20px;"></div>
             <a href="{{ url_for('lta_search') }}" target="blank"><button class='btn btn-default'>Back</button></a>
 <!--            <input type="submit" value="Re-plot"class='btn btn-primary'>-->
