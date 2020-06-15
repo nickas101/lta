@@ -9,10 +9,11 @@
 
 <div class="container-fluid">
 
-    <img class="plot1" src="/lta/plot/plot1.png" alt="my plot" align="middle">
-    <img class="plot2" src="/lta/plot/plot2.png" alt="my plot" align="middle">
-    <img class="plot3" src="/lta/plot/plot3.png" alt="my plot" align="middle">
-    <img class="plot4" src="/lta/plot/plot4.png" alt="my plot" align="middle">
+    <img class="img-responsive center-block plot1" src="/lta/plot/plot1.png" alt="plot" align="centre">
+    <img class="img-responsive center-block plot2" src="/lta/plot/plot2.png" alt="plot" align="centre">
+    <img class="img-responsive center-block plot3" src="/lta/plot/plot3.png" alt="plot" align="centre">
+    <img class="img-responsive center-block plot4" src="/lta/plot/plot4.png" alt="plot" align="centre">
+
 <div style = "margin: 20px; margin-left: 10%;">
   <div style="padding-top: 10px;"></div>
     <form class="replot" id="form2" action="{{ url_for('lta_replot') }}" method="POST" enctype="multipart/form-data">

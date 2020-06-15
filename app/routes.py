@@ -348,7 +348,7 @@ def plot1_png():
     crystal_number = result['crystalNumber'].iloc[selected]
     packet_number = result['packetNumber'].iloc[selected]
 
-    fig = Figure(figsize=(12, 6), dpi=110)
+    fig = Figure(figsize=(16, 8))
     # figFvT = plt.figure(figsize=(12, 10))
     axis = fig.add_subplot(1, 1, 1)
 
@@ -502,7 +502,7 @@ def plot2_png():
     crystal_number = result['crystalNumber'].iloc[selected]
     packet_number = result['packetNumber'].iloc[selected]
 
-    fig = Figure(figsize=(12, 6), dpi=110)
+    fig = Figure(figsize=(16, 8))
     # figFvT = plt.figure(figsize=(12, 10))
     axis = fig.add_subplot(1, 1, 1)
 
@@ -658,7 +658,7 @@ def plot3_png():
     crystal_number = result['crystalNumber'].iloc[selected]
     packet_number = result['packetNumber'].iloc[selected]
 
-    fig = Figure(figsize=(12, 6), dpi=110)
+    fig = Figure(figsize=(16, 8))
     # figFvT = plt.figure(figsize=(12, 10))
     axis = fig.add_subplot(1, 1, 1)
 
@@ -811,7 +811,7 @@ def plot4_png():
     crystal_number = result['crystalNumber'].iloc[selected]
     packet_number = result['packetNumber'].iloc[selected]
 
-    fig = Figure(figsize=(12, 6), dpi=110)
+    fig = Figure(figsize=(16, 8))
     # figFvT = plt.figure(figsize=(12, 10))
     axis = fig.add_subplot(1, 1, 1)
 
