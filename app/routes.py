@@ -204,6 +204,7 @@ def lta_search():
                            )
 
 
+
 @app.route('/lta/plot', methods=['post', 'get'])
 def lta_plot():
     global result
@@ -221,6 +222,7 @@ def lta_plot():
     global progress
     global dot
 
+    save = False
     threshold = 50
     diff_threshold = .5
     current = ''
@@ -254,11 +256,12 @@ def lta_plot():
 
 
     return render_template('plot_result.html',
-                           filename = filename_plt,
-                           normal = norm,
-                           diff = diff_fltr,
+                           filename=filename_plt,
+                           normal=norm,
+                           diff=diff_fltr,
                            dot=dot,
-                           gs = gauss)
+                           save=save,
+                           gs=gauss)
 
 
 @app.route('/lta/data')
@@ -296,6 +299,8 @@ def lta_replot():
     global gauss
     global dot
 
+    save = False
+
     if request.form.getlist('norm'):
         norm = True
     else:
@@ -323,12 +328,68 @@ def lta_replot():
                            normal = norm,
                            diff = diff_fltr,
                            dot=dot,
+                           save=save,
                            gs = gauss)
 
+#
+#
+# @app.route('/lta/replot/save', methods=['post', 'get'])
+# def lta_replot_save():
+#     global result
+#     global selected
+#     global purposes
+#     global plot_result
+#     global locations
+#     global plot_filename
+#     global filename_plt
+#     global norm
+#     global diff_fltr
+#     global gauss
+#     global dot
+#
+#     save = True
+#
+#     print('***/lta/replot/save')
+#
+#     if request.form.getlist('norm'):
+#         norm = True
+#     else:
+#         norm = False
+#
+#     if request.form.getlist('diff_fltr'):
+#         diff_fltr = True
+#     else:
+#         diff_fltr = False
+#
+#     if request.form.getlist('gauss'):
+#         gauss = True
+#     else:
+#         gauss = False
+#
+#     if request.form.getlist('dot'):
+#         dot = True
+#     else:
+#         dot = False
+#
+#     if request.form.getlist('file_name'):
+#         filename_plt = str(request.form.getlist('file_name')) + '.png'
+#         print(request.form.getlist('file_name'))
+#
+#
+#     # plot_result, locations = lta_script.plot(selected, result)
+#
+#     return render_template('plot_result.html',
+#                            filename = filename_plt,
+#                            normal = norm,
+#                            diff = diff_fltr,
+#                            dot=dot,
+#                            save=save,
+#                            gs = gauss)
+#
 
 
-@app.route('/lta/plot/plot1.png', methods=['post', 'get'])
-def plot1_png():
+@app.route('/lta/plot/plot.png', methods=['post', 'get'])
+def plot_png():
     global result
     global selected
     global purposes
@@ -404,10 +465,17 @@ def plot1_png():
         brd = result_single['brd'].iloc[0]
         label = "loc#" + str(loc)
 
-        #if diff_fltr:
-        data = result_single['freq_ppb_fltr_cut']
-        # else:
-        #     data = result_single['freq_ppb']
+        if diff_fltr:
+            if gauss:
+                data_plot = result_single['freq_ppb_fltr_cut_smo']
+            else:
+                data_plot = result_single['freq_ppb_fltr_cut']
+        else:
+            if gauss:
+                data_plot = result_single['freq_ppb_smo']
+            else:
+                data_plot = result_single['freq_ppb']
+
 
         if result_single['Days'].max() < 25:
             sigma = 3
@@ -418,8 +486,8 @@ def plot1_png():
         else:
             sigma = 50
 
-        #if gauss:
-        data_plot = result_single['freq_ppb_fltr_cut_smo']
+        # if gauss:
+        #     data_plot = result_single['freq_ppb_fltr_cut_smo']
         # else:
         #     data_plot = data
 
@@ -470,7 +538,8 @@ def plot1_png():
     file_time = file_time.replace(":", "-")
     file_time = file_time.split(".")
 
-    filename_plt = 'plot_' + str(file_time[0]) + '.png'
+    # filename_plt = 'plot_' + str(file_time[0]) + '.png'
+    filename_plt = 'plot.png'
     # folder = r'C:/Temp/downloads/'
     folder = base_directory + r'/temp_files/'
     plot_filename = folder + filename_plt
@@ -480,466 +549,469 @@ def plot1_png():
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
-
-@app.route('/lta/plot/plot2.png', methods=['post', 'get'])
-def plot2_png():
-    global result
-    global selected
-    global purposes
-    global plot_result
-    global locations
-    global plot_filename
-    global filename_plt
-    global norm
-    global diff_fltr
-    global gauss
-    global dot
-
-
-    freq_nom = float(result['nomFrq'].iloc[selected])
-    freq_nom_str = str(freq_nom / 1000000) + "MHz"
-    crystal_type = result['crystalType'].iloc[selected]
-    crystal_number = result['crystalNumber'].iloc[selected]
-    packet_number = result['packetNumber'].iloc[selected]
-
-    fig = Figure(figsize=(16, 8))
-    # figFvT = plt.figure(figsize=(12, 10))
-    axis = fig.add_subplot(1, 1, 1)
-
-    # axis.plot(xs, ys)
-
-    # plotTitle = "Ageing data for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(crystal_number) + ", packet #" + str(packet_number)
-    # axis.set_title(plotTitle)
-    axis.set_xlabel('Days')
-
-    if norm:
-        axis.set_ylabel('Frequency, ppb')
-        norm_str = " (normalized)"
-    else:
-        axis.set_ylabel('Frequency, ppm')
-        norm_str = ""
-
-    # # ax1.tick_params(axis = 'y', colors = 'b')
-    #
-    # locations = locations.sort()
-
-    for location in locations:
-        print(location)
-        result_single = plot_result[plot_result['fk_locID'] == location]
-        result_single = result_single.sort_values(by=['measDate'])
-
-        # result_single['DIFF'] = diff(result_single['compFreq'])
-        # df_selected = result_single.copy()
-        # indes2 = df_selected[((df_selected['DIFF'] > diff_threshold) | (df_selected['DIFF'] < -diff_threshold))].index
-        # df_selected.drop(indes2, inplace=True)
-
-
-
-        # result_single['freq_savgol'] = signal.savgol_filter(result_single['compFreq'], 31, 0)
-        #
-        # freq_raw = df_output['compFreq']
-        # # freq_raw = df_output['freq_savgol']
-        # freq_ftr = ndimage.gaussian_filter(freq_raw, sigma=sigm, order=0)
-        #
-        # if gauss:
-        #     df_output['freq_fltr'] = freq_ftr
-        # else:
-        #     df_output['freq_fltr'] = freq_raw
-        #
-        # freq_initial = df_output['freq_fltr'].iloc[0]
-        # freq_ppm = 1000000 * (df_output['freq_fltr'] - freq_nom) / freq_nom
-        # freq_ppb = 1000000000 * (df_output['freq_fltr'] - freq_initial) / freq_initial
-
-
-
-        # bins = result_single['measDate']
-        bins = result_single['Days']
-        loc = result_single['loc'].iloc[0]
-        brd = result_single['brd'].iloc[0]
-        label = "loc#" + str(loc)
-
-        #if diff_fltr:
-        #data = result_single['freq_ppb_fltr_cut']
-        # else:
-        data = result_single['freq_ppb']
-
-        if result_single['Days'].max() < 25:
-            sigma = 3
-        elif result_single['Days'].max() < 50:
-            sigma = 5
-        elif result_single['Days'].max() < 80:
-            sigma = 10
-        else:
-            sigma = 50
-
-        #if gauss:
-        data_plot = result_single['freq_ppb_smo']
-        #else:
-        #    data_plot = data
-
-        # if norm:
-        #     data = freq_ppb
-        # else:
-        #     data = freq_ppm
-
-        #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
-        # axis.plot(bins, data_plot, alpha=1, label=label, linewidth= .75)
-
-        if dot:
-            axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
-        else:
-            axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
-
-            #ax2 = axis.twinx()
-            # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
-
-    plotTitle = "Ageing data" + norm_str + " for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(
-        crystal_number) + ", packet #" + str(packet_number) + ", board #" + str(brd)
-    axis.set_title(plotTitle)
-
-    #
-    #     ax1.plot(bins, data, alpha=1, label="LTA", linewidth=1)
-    #
-    # Show the major grid lines with dark grey lines
-    axis.grid(b=True, which='major', color='#666666', linestyle='-', alpha=0.5)
-
-    # Show the minor grid lines with very faint and almost transparent grey lines
-    axis.minorticks_on()
-    axis.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
-    axis.legend()
-    #
-    # labels = axis.get_xticklabels()
-    # axis.setp(labels, rotation=45, horizontalalignment='right')
-    #
-
-    # fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
-    # fig.canvas.draw()
-    #
-    # # add toolbar
-    # toolbar = self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
-
-    finish_time = datetime.now()
-    file_time = str(finish_time)
-    file_time = file_time.replace(" ", "_")
-    file_time = file_time.replace(":", "-")
-    file_time = file_time.split(".")
-
-    filename_plt = 'plot_' + str(file_time[0]) + '.png'
-    # folder = r'C:/Temp/downloads/'
-    folder = base_directory + r'/temp_files/'
-    plot_filename = folder + filename_plt
-    fig.savefig(plot_filename, bbox_inches='tight')
-
-    output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
-    return Response(output.getvalue(), mimetype='image/png')
-
-
-
-
-@app.route('/lta/plot/plot3.png', methods=['post', 'get'])
-def plot3_png():
-    global result
-    global selected
-    global purposes
-    global plot_result
-    global locations
-    global plot_filename
-    global filename_plt
-    global norm
-    global diff_fltr
-    global gauss
-    global dot
-
-
-    freq_nom = float(result['nomFrq'].iloc[selected])
-    freq_nom_str = str(freq_nom / 1000000) + "MHz"
-    crystal_type = result['crystalType'].iloc[selected]
-    crystal_number = result['crystalNumber'].iloc[selected]
-    packet_number = result['packetNumber'].iloc[selected]
-
-    fig = Figure(figsize=(16, 8))
-    # figFvT = plt.figure(figsize=(12, 10))
-    axis = fig.add_subplot(1, 1, 1)
-
-    # axis.plot(xs, ys)
-
-    # plotTitle = "Ageing data for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(crystal_number) + ", packet #" + str(packet_number)
-    # axis.set_title(plotTitle)
-    axis.set_xlabel('Days')
-
-    if norm:
-        axis.set_ylabel('Frequency, ppb')
-        norm_str = " (normalized)"
-    else:
-        axis.set_ylabel('Frequency, ppm')
-        norm_str = ""
-
-    # # ax1.tick_params(axis = 'y', colors = 'b')
-    #
-    # locations = locations.sort()
-
-    for location in locations:
-        print(location)
-        result_single = plot_result[plot_result['fk_locID'] == location]
-        result_single = result_single.sort_values(by=['measDate'])
-
-        # result_single['DIFF'] = diff(result_single['compFreq'])
-        # df_selected = result_single.copy()
-        # indes2 = df_selected[((df_selected['DIFF'] > diff_threshold) | (df_selected['DIFF'] < -diff_threshold))].index
-        # df_selected.drop(indes2, inplace=True)
-
-
-
-        # result_single['freq_savgol'] = signal.savgol_filter(result_single['compFreq'], 31, 0)
-        #
-        # freq_raw = df_output['compFreq']
-        # # freq_raw = df_output['freq_savgol']
-        # freq_ftr = ndimage.gaussian_filter(freq_raw, sigma=sigm, order=0)
-        #
-        # if gauss:
-        #     df_output['freq_fltr'] = freq_ftr
-        # else:
-        #     df_output['freq_fltr'] = freq_raw
-        #
-        # freq_initial = df_output['freq_fltr'].iloc[0]
-        # freq_ppm = 1000000 * (df_output['freq_fltr'] - freq_nom) / freq_nom
-        # freq_ppb = 1000000000 * (df_output['freq_fltr'] - freq_initial) / freq_initial
-
-
-
-        # bins = result_single['measDate']
-        bins = result_single['Days']
-        loc = result_single['loc'].iloc[0]
-        brd = result_single['brd'].iloc[0]
-        label = "loc#" + str(loc)
-
-        #if diff_fltr:
-        data = result_single['freq_ppb_fltr_cut']
-        # else:
-        #     data = result_single['freq_ppb']
-
-        if result_single['Days'].max() < 25:
-            sigma = 3
-        elif result_single['Days'].max() < 50:
-            sigma = 5
-        elif result_single['Days'].max() < 80:
-            sigma = 10
-        else:
-            sigma = 50
-
-        #if gauss:
-        #data_plot = ndimage.gaussian_filter(data, sigma=sigma, order=0)
-        #else:
-        data_plot = data
-
-        # if norm:
-        #     data = freq_ppb
-        # else:
-        #     data = freq_ppm
-
-        #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
-
-        if dot:
-            axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
-        else:
-            axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
-
-            #ax2 = axis.twinx()
-            # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
-
-    plotTitle = "Ageing data" + norm_str + " for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(
-        crystal_number) + ", packet #" + str(packet_number) + ", board #" + str(brd)
-    axis.set_title(plotTitle)
-
-    #
-    #     ax1.plot(bins, data, alpha=1, label="LTA", linewidth=1)
-    #
-    # Show the major grid lines with dark grey lines
-    axis.grid(b=True, which='major', color='#666666', linestyle='-', alpha=0.5)
-
-    # Show the minor grid lines with very faint and almost transparent grey lines
-    axis.minorticks_on()
-    axis.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
-    axis.legend()
-    #
-    # labels = axis.get_xticklabels()
-    # axis.setp(labels, rotation=45, horizontalalignment='right')
-    #
-
-    # fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
-    # fig.canvas.draw()
-    #
-    # # add toolbar
-    # toolbar = self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
-
-    finish_time = datetime.now()
-    file_time = str(finish_time)
-    file_time = file_time.replace(" ", "_")
-    file_time = file_time.replace(":", "-")
-    file_time = file_time.split(".")
-
-    filename_plt = 'plot_' + str(file_time[0]) + '.png'
-    # folder = r'C:/Temp/downloads/'
-    folder = base_directory + r'/temp_files/'
-    plot_filename = folder + filename_plt
-    fig.savefig(plot_filename, bbox_inches='tight')
-
-    output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
-    return Response(output.getvalue(), mimetype='image/png')
-
-
-@app.route('/lta/plot/plot4.png', methods=['post', 'get'])
-def plot4_png():
-    global result
-    global selected
-    global purposes
-    global plot_result
-    global locations
-    global plot_filename
-    global filename_plt
-    global norm
-    global diff_fltr
-    global gauss
-    global dot
-
-
-    freq_nom = float(result['nomFrq'].iloc[selected])
-    freq_nom_str = str(freq_nom / 1000000) + "MHz"
-    crystal_type = result['crystalType'].iloc[selected]
-    crystal_number = result['crystalNumber'].iloc[selected]
-    packet_number = result['packetNumber'].iloc[selected]
-
-    fig = Figure(figsize=(16, 8))
-    # figFvT = plt.figure(figsize=(12, 10))
-    axis = fig.add_subplot(1, 1, 1)
-
-    # axis.plot(xs, ys)
-
-    # plotTitle = "Ageing data for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(crystal_number) + ", packet #" + str(packet_number)
-    # axis.set_title(plotTitle)
-    axis.set_xlabel('Days')
-
-    if norm:
-        axis.set_ylabel('Frequency, ppb')
-        norm_str = " (normalized)"
-    else:
-        axis.set_ylabel('Frequency, ppm')
-        norm_str = ""
-
-    # # ax1.tick_params(axis = 'y', colors = 'b')
-    #
-    # locations = locations.sort()
-
-    for location in locations:
-        print(location)
-        result_single = plot_result[plot_result['fk_locID'] == location]
-        result_single = result_single.sort_values(by=['measDate'])
-
-        # result_single['DIFF'] = diff(result_single['compFreq'])
-        # df_selected = result_single.copy()
-        # indes2 = df_selected[((df_selected['DIFF'] > diff_threshold) | (df_selected['DIFF'] < -diff_threshold))].index
-        # df_selected.drop(indes2, inplace=True)
-
-
-
-        # result_single['freq_savgol'] = signal.savgol_filter(result_single['compFreq'], 31, 0)
-        #
-        # freq_raw = df_output['compFreq']
-        # # freq_raw = df_output['freq_savgol']
-        # freq_ftr = ndimage.gaussian_filter(freq_raw, sigma=sigm, order=0)
-        #
-        # if gauss:
-        #     df_output['freq_fltr'] = freq_ftr
-        # else:
-        #     df_output['freq_fltr'] = freq_raw
-        #
-        # freq_initial = df_output['freq_fltr'].iloc[0]
-        # freq_ppm = 1000000 * (df_output['freq_fltr'] - freq_nom) / freq_nom
-        # freq_ppb = 1000000000 * (df_output['freq_fltr'] - freq_initial) / freq_initial
-
-
-
-        # bins = result_single['measDate']
-        bins = result_single['Days']
-        loc = result_single['loc'].iloc[0]
-        brd = result_single['brd'].iloc[0]
-        label = "loc#" + str(loc)
-
-        #if diff_fltr:
-        #data = result_single['freq_ppb_fltr_cut']
-        # else:
-        data = result_single['freq_ppb']
-
-        if result_single['Days'].max() < 25:
-            sigma = 3
-        elif result_single['Days'].max() < 50:
-            sigma = 5
-        elif result_single['Days'].max() < 80:
-            sigma = 10
-        else:
-            sigma = 50
-
-        # if gauss:
-        #     data_plot = ndimage.gaussian_filter(data, sigma=sigma, order=0)
-        # else:
-        data_plot = data
-
-        # if norm:
-        #     data = freq_ppb
-        # else:
-        #     data = freq_ppm
-
-        #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
-        if dot:
-            axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
-        else:
-            axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
-            #ax2 = axis.twinx()
-            # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
-
-    plotTitle = "Ageing data" + norm_str + " for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(
-        crystal_number) + ", packet #" + str(packet_number) + ", board #" + str(brd)
-    axis.set_title(plotTitle)
-
-    #
-    #     ax1.plot(bins, data, alpha=1, label="LTA", linewidth=1)
-    #
-    # Show the major grid lines with dark grey lines
-    axis.grid(b=True, which='major', color='#666666', linestyle='-', alpha=0.5)
-
-    # Show the minor grid lines with very faint and almost transparent grey lines
-    axis.minorticks_on()
-    axis.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
-    axis.legend()
-    #
-    # labels = axis.get_xticklabels()
-    # axis.setp(labels, rotation=45, horizontalalignment='right')
-    #
-
-    # fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
-    # fig.canvas.draw()
-    #
-    # # add toolbar
-    # toolbar = self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
-
-    finish_time = datetime.now()
-    file_time = str(finish_time)
-    file_time = file_time.replace(" ", "_")
-    file_time = file_time.replace(":", "-")
-    file_time = file_time.split(".")
-
-    filename_plt = 'plot_' + str(file_time[0]) + '.png'
-    # folder = r'C:/Temp/downloads/'
-    folder = base_directory + r'/temp_files/'
-    plot_filename = folder + filename_plt
-    fig.savefig(plot_filename, bbox_inches='tight')
-
-    output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
-    return Response(output.getvalue(), mimetype='image/png')
-
+#
+# @app.route('/lta/plot/plot2.png', methods=['post', 'get'])
+# def plot2_png():
+#     global result
+#     global selected
+#     global purposes
+#     global plot_result
+#     global locations
+#     global plot_filename
+#     global filename_plt
+#     global norm
+#     global diff_fltr
+#     global gauss
+#     global dot
+#
+#
+#     freq_nom = float(result['nomFrq'].iloc[selected])
+#     freq_nom_str = str(freq_nom / 1000000) + "MHz"
+#     crystal_type = result['crystalType'].iloc[selected]
+#     crystal_number = result['crystalNumber'].iloc[selected]
+#     packet_number = result['packetNumber'].iloc[selected]
+#
+#     fig = Figure(figsize=(16, 8))
+#     # figFvT = plt.figure(figsize=(12, 10))
+#     axis = fig.add_subplot(1, 1, 1)
+#
+#     # axis.plot(xs, ys)
+#
+#     # plotTitle = "Ageing data for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(crystal_number) + ", packet #" + str(packet_number)
+#     # axis.set_title(plotTitle)
+#     axis.set_xlabel('Days')
+#
+#     if norm:
+#         axis.set_ylabel('Frequency, ppb')
+#         norm_str = " (normalized)"
+#     else:
+#         axis.set_ylabel('Frequency, ppm')
+#         norm_str = ""
+#
+#     # # ax1.tick_params(axis = 'y', colors = 'b')
+#     #
+#     # locations = locations.sort()
+#
+#     for location in locations:
+#         print(location)
+#         result_single = plot_result[plot_result['fk_locID'] == location]
+#         result_single = result_single.sort_values(by=['measDate'])
+#
+#         # result_single['DIFF'] = diff(result_single['compFreq'])
+#         # df_selected = result_single.copy()
+#         # indes2 = df_selected[((df_selected['DIFF'] > diff_threshold) | (df_selected['DIFF'] < -diff_threshold))].index
+#         # df_selected.drop(indes2, inplace=True)
+#
+#
+#
+#         # result_single['freq_savgol'] = signal.savgol_filter(result_single['compFreq'], 31, 0)
+#         #
+#         # freq_raw = df_output['compFreq']
+#         # # freq_raw = df_output['freq_savgol']
+#         # freq_ftr = ndimage.gaussian_filter(freq_raw, sigma=sigm, order=0)
+#         #
+#         # if gauss:
+#         #     df_output['freq_fltr'] = freq_ftr
+#         # else:
+#         #     df_output['freq_fltr'] = freq_raw
+#         #
+#         # freq_initial = df_output['freq_fltr'].iloc[0]
+#         # freq_ppm = 1000000 * (df_output['freq_fltr'] - freq_nom) / freq_nom
+#         # freq_ppb = 1000000000 * (df_output['freq_fltr'] - freq_initial) / freq_initial
+#
+#
+#
+#         # bins = result_single['measDate']
+#         bins = result_single['Days']
+#         loc = result_single['loc'].iloc[0]
+#         brd = result_single['brd'].iloc[0]
+#         label = "loc#" + str(loc)
+#
+#         #if diff_fltr:
+#         #data = result_single['freq_ppb_fltr_cut']
+#         # else:
+#         data = result_single['freq_ppb']
+#
+#         if result_single['Days'].max() < 25:
+#             sigma = 3
+#         elif result_single['Days'].max() < 50:
+#             sigma = 5
+#         elif result_single['Days'].max() < 80:
+#             sigma = 10
+#         else:
+#             sigma = 50
+#
+#         #if gauss:
+#         data_plot = result_single['freq_ppb_smo']
+#         #else:
+#         #    data_plot = data
+#
+#         # if norm:
+#         #     data = freq_ppb
+#         # else:
+#         #     data = freq_ppm
+#
+#         #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
+#         # axis.plot(bins, data_plot, alpha=1, label=label, linewidth= .75)
+#
+#         if dot:
+#             axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
+#         else:
+#             axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
+#
+#             #ax2 = axis.twinx()
+#             # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
+#
+#     plotTitle = "Ageing data" + norm_str + " for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(
+#         crystal_number) + ", packet #" + str(packet_number) + ", board #" + str(brd)
+#     axis.set_title(plotTitle)
+#
+#     #
+#     #     ax1.plot(bins, data, alpha=1, label="LTA", linewidth=1)
+#     #
+#     # Show the major grid lines with dark grey lines
+#     axis.grid(b=True, which='major', color='#666666', linestyle='-', alpha=0.5)
+#
+#     # Show the minor grid lines with very faint and almost transparent grey lines
+#     axis.minorticks_on()
+#     axis.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
+#     axis.legend()
+#     #
+#     # labels = axis.get_xticklabels()
+#     # axis.setp(labels, rotation=45, horizontalalignment='right')
+#     #
+#
+#     # fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
+#     # fig.canvas.draw()
+#     #
+#     # # add toolbar
+#     # toolbar = self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
+#
+#     finish_time = datetime.now()
+#     file_time = str(finish_time)
+#     file_time = file_time.replace(" ", "_")
+#     file_time = file_time.replace(":", "-")
+#     file_time = file_time.split(".")
+#
+#     # filename_plt = 'plot_' + str(file_time[0]) + '.png'
+#     filename_plt = 'plot_2.png'
+#     # folder = r'C:/Temp/downloads/'
+#     folder = base_directory + r'/temp_files/'
+#     plot_filename = folder + filename_plt
+#     fig.savefig(plot_filename, bbox_inches='tight')
+#
+#     output = io.BytesIO()
+#     FigureCanvas(fig).print_png(output)
+#     return Response(output.getvalue(), mimetype='image/png')
+#
+#
+#
+#
+# @app.route('/lta/plot/plot3.png', methods=['post', 'get'])
+# def plot3_png():
+#     global result
+#     global selected
+#     global purposes
+#     global plot_result
+#     global locations
+#     global plot_filename
+#     global filename_plt
+#     global norm
+#     global diff_fltr
+#     global gauss
+#     global dot
+#
+#
+#     freq_nom = float(result['nomFrq'].iloc[selected])
+#     freq_nom_str = str(freq_nom / 1000000) + "MHz"
+#     crystal_type = result['crystalType'].iloc[selected]
+#     crystal_number = result['crystalNumber'].iloc[selected]
+#     packet_number = result['packetNumber'].iloc[selected]
+#
+#     fig = Figure(figsize=(16, 8))
+#     # figFvT = plt.figure(figsize=(12, 10))
+#     axis = fig.add_subplot(1, 1, 1)
+#
+#     # axis.plot(xs, ys)
+#
+#     # plotTitle = "Ageing data for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(crystal_number) + ", packet #" + str(packet_number)
+#     # axis.set_title(plotTitle)
+#     axis.set_xlabel('Days')
+#
+#     if norm:
+#         axis.set_ylabel('Frequency, ppb')
+#         norm_str = " (normalized)"
+#     else:
+#         axis.set_ylabel('Frequency, ppm')
+#         norm_str = ""
+#
+#     # # ax1.tick_params(axis = 'y', colors = 'b')
+#     #
+#     # locations = locations.sort()
+#
+#     for location in locations:
+#         print(location)
+#         result_single = plot_result[plot_result['fk_locID'] == location]
+#         result_single = result_single.sort_values(by=['measDate'])
+#
+#         # result_single['DIFF'] = diff(result_single['compFreq'])
+#         # df_selected = result_single.copy()
+#         # indes2 = df_selected[((df_selected['DIFF'] > diff_threshold) | (df_selected['DIFF'] < -diff_threshold))].index
+#         # df_selected.drop(indes2, inplace=True)
+#
+#
+#
+#         # result_single['freq_savgol'] = signal.savgol_filter(result_single['compFreq'], 31, 0)
+#         #
+#         # freq_raw = df_output['compFreq']
+#         # # freq_raw = df_output['freq_savgol']
+#         # freq_ftr = ndimage.gaussian_filter(freq_raw, sigma=sigm, order=0)
+#         #
+#         # if gauss:
+#         #     df_output['freq_fltr'] = freq_ftr
+#         # else:
+#         #     df_output['freq_fltr'] = freq_raw
+#         #
+#         # freq_initial = df_output['freq_fltr'].iloc[0]
+#         # freq_ppm = 1000000 * (df_output['freq_fltr'] - freq_nom) / freq_nom
+#         # freq_ppb = 1000000000 * (df_output['freq_fltr'] - freq_initial) / freq_initial
+#
+#
+#
+#         # bins = result_single['measDate']
+#         bins = result_single['Days']
+#         loc = result_single['loc'].iloc[0]
+#         brd = result_single['brd'].iloc[0]
+#         label = "loc#" + str(loc)
+#
+#         #if diff_fltr:
+#         data = result_single['freq_ppb_fltr_cut']
+#         # else:
+#         #     data = result_single['freq_ppb']
+#
+#         if result_single['Days'].max() < 25:
+#             sigma = 3
+#         elif result_single['Days'].max() < 50:
+#             sigma = 5
+#         elif result_single['Days'].max() < 80:
+#             sigma = 10
+#         else:
+#             sigma = 50
+#
+#         #if gauss:
+#         #data_plot = ndimage.gaussian_filter(data, sigma=sigma, order=0)
+#         #else:
+#         data_plot = data
+#
+#         # if norm:
+#         #     data = freq_ppb
+#         # else:
+#         #     data = freq_ppm
+#
+#         #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
+#
+#         if dot:
+#             axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='.75', linewidth= .75)
+#         else:
+#             axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
+#
+#             #ax2 = axis.twinx()
+#             # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
+#
+#     plotTitle = "Ageing data" + norm_str + " for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(
+#         crystal_number) + ", packet #" + str(packet_number) + ", board #" + str(brd)
+#     axis.set_title(plotTitle)
+#
+#     #
+#     #     ax1.plot(bins, data, alpha=1, label="LTA", linewidth=1)
+#     #
+#     # Show the major grid lines with dark grey lines
+#     axis.grid(b=True, which='major', color='#666666', linestyle='-', alpha=0.5)
+#
+#     # Show the minor grid lines with very faint and almost transparent grey lines
+#     axis.minorticks_on()
+#     axis.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
+#     axis.legend()
+#     #
+#     # labels = axis.get_xticklabels()
+#     # axis.setp(labels, rotation=45, horizontalalignment='right')
+#     #
+#
+#     # fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
+#     # fig.canvas.draw()
+#     #
+#     # # add toolbar
+#     # toolbar = self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
+#
+#     finish_time = datetime.now()
+#     file_time = str(finish_time)
+#     file_time = file_time.replace(" ", "_")
+#     file_time = file_time.replace(":", "-")
+#     file_time = file_time.split(".")
+#
+#     # filename_plt = 'plot_' + str(file_time[0]) + '.png'
+#     filename_plt = 'plot_3.png'
+#     # folder = r'C:/Temp/downloads/'
+#     folder = base_directory + r'/temp_files/'
+#     plot_filename = folder + filename_plt
+#     fig.savefig(plot_filename, bbox_inches='tight')
+#
+#     output = io.BytesIO()
+#     FigureCanvas(fig).print_png(output)
+#     return Response(output.getvalue(), mimetype='image/png')
+#
+#
+# @app.route('/lta/plot/plot4.png', methods=['post', 'get'])
+# def plot4_png():
+#     global result
+#     global selected
+#     global purposes
+#     global plot_result
+#     global locations
+#     global plot_filename
+#     global filename_plt
+#     global norm
+#     global diff_fltr
+#     global gauss
+#     global dot
+#
+#
+#     freq_nom = float(result['nomFrq'].iloc[selected])
+#     freq_nom_str = str(freq_nom / 1000000) + "MHz"
+#     crystal_type = result['crystalType'].iloc[selected]
+#     crystal_number = result['crystalNumber'].iloc[selected]
+#     packet_number = result['packetNumber'].iloc[selected]
+#
+#     fig = Figure(figsize=(16, 8))
+#     # figFvT = plt.figure(figsize=(12, 10))
+#     axis = fig.add_subplot(1, 1, 1)
+#
+#     # axis.plot(xs, ys)
+#
+#     # plotTitle = "Ageing data for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(crystal_number) + ", packet #" + str(packet_number)
+#     # axis.set_title(plotTitle)
+#     axis.set_xlabel('Days')
+#
+#     if norm:
+#         axis.set_ylabel('Frequency, ppb')
+#         norm_str = " (normalized)"
+#     else:
+#         axis.set_ylabel('Frequency, ppm')
+#         norm_str = ""
+#
+#     # # ax1.tick_params(axis = 'y', colors = 'b')
+#     #
+#     # locations = locations.sort()
+#
+#     for location in locations:
+#         print(location)
+#         result_single = plot_result[plot_result['fk_locID'] == location]
+#         result_single = result_single.sort_values(by=['measDate'])
+#
+#         # result_single['DIFF'] = diff(result_single['compFreq'])
+#         # df_selected = result_single.copy()
+#         # indes2 = df_selected[((df_selected['DIFF'] > diff_threshold) | (df_selected['DIFF'] < -diff_threshold))].index
+#         # df_selected.drop(indes2, inplace=True)
+#
+#
+#
+#         # result_single['freq_savgol'] = signal.savgol_filter(result_single['compFreq'], 31, 0)
+#         #
+#         # freq_raw = df_output['compFreq']
+#         # # freq_raw = df_output['freq_savgol']
+#         # freq_ftr = ndimage.gaussian_filter(freq_raw, sigma=sigm, order=0)
+#         #
+#         # if gauss:
+#         #     df_output['freq_fltr'] = freq_ftr
+#         # else:
+#         #     df_output['freq_fltr'] = freq_raw
+#         #
+#         # freq_initial = df_output['freq_fltr'].iloc[0]
+#         # freq_ppm = 1000000 * (df_output['freq_fltr'] - freq_nom) / freq_nom
+#         # freq_ppb = 1000000000 * (df_output['freq_fltr'] - freq_initial) / freq_initial
+#
+#
+#
+#         # bins = result_single['measDate']
+#         bins = result_single['Days']
+#         loc = result_single['loc'].iloc[0]
+#         brd = result_single['brd'].iloc[0]
+#         label = "loc#" + str(loc)
+#
+#         #if diff_fltr:
+#         #data = result_single['freq_ppb_fltr_cut']
+#         # else:
+#         data = result_single['freq_ppb']
+#
+#         if result_single['Days'].max() < 25:
+#             sigma = 3
+#         elif result_single['Days'].max() < 50:
+#             sigma = 5
+#         elif result_single['Days'].max() < 80:
+#             sigma = 10
+#         else:
+#             sigma = 50
+#
+#         # if gauss:
+#         #     data_plot = ndimage.gaussian_filter(data, sigma=sigma, order=0)
+#         # else:
+#         data_plot = data
+#
+#         # if norm:
+#         #     data = freq_ppb
+#         # else:
+#         #     data = freq_ppm
+#
+#         #if location == '12925A25-0672-4705-ADAC-F1A290BC4A34':
+#         if dot:
+#             axis.plot(bins, data_plot, alpha=1, label=label, marker='o', markersize='1', linewidth= .5)
+#         else:
+#             axis.plot(bins, data_plot, alpha=1, label=label, linewidth=.75)
+#             #ax2 = axis.twinx()
+#             # ax2.plot(bins, df_output['DIFF'], alpha=1, label=label, color = 'tab:orange', linewidth=.75)
+#
+#     plotTitle = "Ageing data" + norm_str + " for " + str(freq_nom_str) + ", " + str(crystal_type) + ", SAP number " + str(
+#         crystal_number) + ", packet #" + str(packet_number) + ", board #" + str(brd)
+#     axis.set_title(plotTitle)
+#
+#     #
+#     #     ax1.plot(bins, data, alpha=1, label="LTA", linewidth=1)
+#     #
+#     # Show the major grid lines with dark grey lines
+#     axis.grid(b=True, which='major', color='#666666', linestyle='-', alpha=0.5)
+#
+#     # Show the minor grid lines with very faint and almost transparent grey lines
+#     axis.minorticks_on()
+#     axis.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.2)
+#     axis.legend()
+#     #
+#     # labels = axis.get_xticklabels()
+#     # axis.setp(labels, rotation=45, horizontalalignment='right')
+#     #
+#
+#     # fig.canvas.manager.toolbar.add_tool('zoom', 'foo')
+#     # fig.canvas.draw()
+#     #
+#     # # add toolbar
+#     # toolbar = self.addToolBar(QtCore.Qt.BottomToolBarArea, NavigationToolbar(self.plotWidget, self))
+#
+#     finish_time = datetime.now()
+#     file_time = str(finish_time)
+#     file_time = file_time.replace(" ", "_")
+#     file_time = file_time.replace(":", "-")
+#     file_time = file_time.split(".")
+#
+#     # filename_plt = 'plot_' + str(file_time[0]) + '.png'
+#     filename_plt = 'plot_4.png'
+#     # folder = r'C:/Temp/downloads/'
+#     folder = base_directory + r'/temp_files/'
+#     plot_filename = folder + filename_plt
+#     fig.savefig(plot_filename, bbox_inches='tight')
+#
+#     output = io.BytesIO()
+#     FigureCanvas(fig).print_png(output)
+#     return Response(output.getvalue(), mimetype='image/png')
+#
 
 
 @app.route('/lta/plot/download', methods=['GET', 'POST'])
@@ -947,6 +1019,12 @@ def download_plot():
     # global folder
     global plot_filename
     global filename_plt
+
+    filename_plt = 'plot' + '.png'
+
+    # if request.method == 'POST' and request.form.get('file_name'):
+    #     filename_plt = request.form.get('file_name') + '.png'
+    #     print(request.form.get('file_name'))
 
     # folder = r'C:/Temp/downloads/'
     folder = base_directory + r'/temp_files/'

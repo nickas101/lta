@@ -9,10 +9,14 @@
 
 <div class="container-fluid">
 
-    <img class="img-responsive center-block plot1" src="/lta/plot/plot1.png" alt="plot" align="centre">
-    <img class="img-responsive center-block plot2" src="/lta/plot/plot2.png" alt="plot" align="centre">
-    <img class="img-responsive center-block plot3" src="/lta/plot/plot3.png" alt="plot" align="centre">
-    <img class="img-responsive center-block plot4" src="/lta/plot/plot4.png" alt="plot" align="centre">
+<!--    {% if save %}-->
+<!--        <meta http-equiv="Refresh" content="0; url=/lta/plot/download" />-->
+<!--    {% endif %}-->
+
+    <img class="img-responsive center-block" src="/lta/plot/plot.png" alt="plot" align="centre">
+<!--    <img class="img-responsive center-block plot2" src="/lta/plot/plot2.png" alt="plot" align="centre">-->
+<!--    <img class="img-responsive center-block plot3" src="/lta/plot/plot3.png" alt="plot" align="centre">-->
+<!--    <img class="img-responsive center-block plot4" src="/lta/plot/plot4.png" alt="plot" align="centre">-->
 
 <div style = "margin: 20px; margin-left: 10%;">
   <div style="padding-top: 10px;"></div>
@@ -56,9 +60,30 @@
 
 
 <div style="padding-top: 20px;"></div>
-            <a href="{{ url_for('lta_search') }}" target="blank"><button class='btn btn-default'>Back</button></a>
+
 <!--            <input type="submit" value="Re-plot"class='btn btn-primary'>-->
-        <a href="/lta/plot/download" target="blank"><button class='btn btn-success'>Save plot</button></a>
+
+<!--    <form id="form3" action="/lta/replot/save" method="POST" enctype="multipart/form-data">-->
+
+        <div class="form-group">
+<!--            <input type="text" class="form-control hidden" id="file_name" name="file_name" value="plot1" placeholder="File name">-->
+
+<!--            <div class="col-sm-1"></div>-->
+            <div class="col-sm-1">
+                <a href="{{ url_for('lta_search') }}" target="blank"><button class='btn btn-default'>Back</button></a>
+            </div>
+            <div class="col-sm-9"></div>
+        <!--        <a href="/lta/plot/download" target="blank"><button class='btn btn-success'>Save plot</button></a>-->
+            <div class="col-sm-1">
+                <a href="/lta/plot/download" target="blank"><button class='btn btn-success'>Save plot</button></a>
+<!--                <button type="submit" class="btn btn-success">Save plot </button>-->
+            </div>
+
+            <div class="col-sm-1"></div>
+
+        </div>
+
+<!--     </form>-->
 
     <div style="padding-top: 20px;"></div>
 
